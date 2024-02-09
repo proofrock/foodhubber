@@ -10,4 +10,23 @@ This project is sponsored by [Emergency ONG Onlus](https://emergency.it) and [At
 
 This project is released as Free and Open Source Software under the [GPLv3 license](https://www.gnu.org/licenses/quick-guide-gplv3.it.html).
 
-**NOTE**: The development is currently happening in the `develop` branch. The first versions will be italian only.wq
+**NOTE**: The development is currently happening in the `develop` branch. The first versions will be italian only.
+
+## Sources
+
+- [Palette](https://kdesign.co/blog/pastel-color-palette-examples/)
+
+# Installation
+
+1. Create the database;
+    1. Create an empty Postgresql engine and connect to it;
+    1. As `postgres`, execute the statements in `data/creation.sql`;
+    1. Connect to the database `foodhubber` as the user `foodhubber` (password is `foodhubber`);
+1. Run the application with the proper parameters (supposing the database is on `localhost:5432`):
+```
+./foodhubber.exe -db "postgresql://foodhubber:foodhubber@localhost:5432/foodhubber"
+```
+
+## Debug
+
+- You can use the `-force-week=1/2/3/4` commandline parameter to simulate being in a week of the month different than the current, real one.

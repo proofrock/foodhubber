@@ -1,0 +1,22 @@
+{
+  "name": "FoodHubber",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@materializecss/materialize": "^1",
+    "@sveltejs/vite-plugin-svelte": "^3",
+    "jssha": "^3",
+    "svelte": "^4",
+    "sweetalert2": "^11",
+    "vite": "^5"
+  },
+  "dependencies": {
+    "date-picker-svelte": "^2.10.1"
+  }
+}

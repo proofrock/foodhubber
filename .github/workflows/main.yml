@@ -1,0 +1,131 @@
+name: Build and Draft Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build dir generation
+        run: mkdir bin/
+
+      - name: Database generation
+        run: |
+          sqlite3 ../backend/foodhubber.db < structure.sql
+          sqlite3 ../backend/foodhubber.db < data.sql
+        working-directory: data/
+
+      - name: Frontend install dependencies
+        run: npm install
+        working-directory: frontend/
+
+      - name: Compile Frontend
+        run: npm run build
+        working-directory: frontend/
+
+      - name: Compile Backend
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath
+          tar czf ../bin/foodhubber-${{ github.ref_name }}-linux-amd64.tar.gz foodhubber foodhubber.db
+          rm foodhubber
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath
+          tar czf ../bin/foodhubber-${{ github.ref_name }}-linux-arm64.tar.gz foodhubber foodhubber.db
+          rm foodhubber
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath
+          zip -9 ../bin/foodhubber-${{ github.ref_name }}-darwin-arm64.zip foodhubber foodhubber.db
+          rm foodhubber
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -trimpath
+          zip -9 ../bin/foodhubber-${{ github.ref_name }}-darwin-amd64.zip foodhubber foodhubber.db
+          rm foodhubber
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath
+          zip -9 ../bin/foodhubber-${{ github.ref_name }}-win-amd64.zip foodhubber.exe foodhubber.db
+          rm foodhubber.exe
+        working-directory: backend/
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts
+          path: bin
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: artifacts
+          path: bin/
+
+      - name: Extract tag name
+        id: tag
+        uses: actions/github-script@0.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            return context.payload.ref.replace(/refs\/tags\//, '');
+
+      - name: Create Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          body: _replace_me_
+          tag_name: ${{ github.ref_name }}
+          release_name: Version ${{ github.ref_name }}
+          draft: true
+          prerelease: false
+
+      - uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/foodhubber-${{ github.ref_name }}-linux-amd64.tar.gz
+          asset_name: foodhubber-${{ github.ref_name }}-linux-amd64.tar.gz
+          asset_content_type: application/gzip
+
+      - uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/foodhubber-${{ github.ref_name }}-linux-arm64.tar.gz
+          asset_name: foodhubber-${{ github.ref_name }}-linux-arm64.tar.gz
+          asset_content_type: application/gzip
+
+      - uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/foodhubber-${{ github.ref_name }}-darwin-arm64.zip
+          asset_name: foodhubber-${{ github.ref_name }}-darwin-arm64.zip
+          asset_content_type: application/zip
+
+      - uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/foodhubber-${{ github.ref_name }}-darwin-amd64.zip
+          asset_name: foodhubber-${{ github.ref_name }}-darwin-amd64.zip
+          asset_content_type: application/zip
+
+      - uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: bin/foodhubber-${{ github.ref_name }}-win-amd64.zip
+          asset_name: foodhubber-${{ github.ref_name }}-win-amd64.zip
+          asset_content_type: application/zip
