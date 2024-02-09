@@ -12,21 +12,22 @@ This project is released as Free and Open Source Software under the [GPLv3 licen
 
 **NOTE**: The development is currently happening in the `develop` branch. The first versions will be italian only.
 
-## Sources
+## Installazione (ita)
+
+- [Scaricare](https://github.com/proofrock/foodhubber/releases) il pacchetto per la propria architettura (es. `foodhubber-v0.1.0-win-amd64.zip`);
+- scompattarlo in una directory;
+- avviare l'eseguibile;
+- di default cerca il database nella directory di esecuzione;
+  - es. sotto windows dovrebbe essere sufficiente fare doppio click sull'eseguibile.
+
+E' attivo un beneficiario con codice `123`.
+
+Per test, potrebbe essere utile cambiare la settimana corrente; può essere fatto con il flag da linea di comando `--force-week`:
+
+```bash
+.\foodhubber.exe --force-week=1
+```
+
+## Resources
 
 - [Palette](https://kdesign.co/blog/pastel-color-palette-examples/)
-
-# Installation
-
-1. Create the database;
-    1. Create an empty Postgresql engine and connect to it;
-    1. As `postgres`, execute the statements in `data/creation.sql`;
-    1. Connect to the database `foodhubber` as the user `foodhubber` (password is `foodhubber`);
-1. Run the application with the proper parameters (supposing the database is on `localhost:5432`):
-```
-./foodhubber.exe -db "postgresql://foodhubber:foodhubber@localhost:5432/foodhubber"
-```
-
-## Debug
-
-- You can use the `-force-week=1/2/3/4` commandline parameter to simulate being in a week of the month different than the current, real one.
