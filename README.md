@@ -19,6 +19,7 @@ This project is released as Free and Open Source Software under the [GPLv3 licen
 - avviare l'eseguibile;
 - di default cerca il database nella directory di esecuzione;
   - es. sotto windows dovrebbe essere sufficiente fare doppio click sull'eseguibile.
+- collegarsi con un browser a http://localhost:31020
 
 E' attivo un beneficiario con codice `123`.
 
