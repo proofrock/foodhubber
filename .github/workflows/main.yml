@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Build dir generation
         run: mkdir bin/
@@ -29,20 +30,36 @@ jobs:
         run: npm run build
         working-directory: frontend/
 
-      - name: Compile Backend
+      - name: Compile Backend [linux/amd64]
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath
           tar czf ../bin/foodhubber-${{ github.ref_name }}-linux-amd64.tar.gz foodhubber foodhubber.db
           rm foodhubber
+        working-directory: backend/
+
+      - name: Compile Backend [linux/arm64]
+        run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath
           tar czf ../bin/foodhubber-${{ github.ref_name }}-linux-arm64.tar.gz foodhubber foodhubber.db
           rm foodhubber
+        working-directory: backend/
+
+      - name: Compile Backend [darwin/amd64]
+        run: |
           CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath
           zip -9 ../bin/foodhubber-${{ github.ref_name }}-darwin-arm64.zip foodhubber foodhubber.db
           rm foodhubber
+        working-directory: backend/
+
+      - name: Compile Backend [darwin/amd64]
+        run: |
           CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -trimpath
           zip -9 ../bin/foodhubber-${{ github.ref_name }}-darwin-amd64.zip foodhubber foodhubber.db
           rm foodhubber
+        working-directory: backend/
+
+      - name: Compile Backend [windows/amd64]
+        run: |
           CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath
           zip -9 ../bin/foodhubber-${{ github.ref_name }}-win-amd64.zip foodhubber.exe foodhubber.db
           rm foodhubber.exe
@@ -52,7 +69,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifacts
-          path: bin
+          path: bin/
 
   release:
     needs: build
@@ -64,14 +81,6 @@ jobs:
         with:
           name: artifacts
           path: bin/
-
-      - name: Extract tag name
-        id: tag
-        uses: actions/github-script@0.2.0
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            return context.payload.ref.replace(/refs\/tags\//, '');
 
       - name: Create Draft Release
         id: create_release
@@ -85,7 +94,8 @@ jobs:
           draft: true
           prerelease: false
 
-      - uses: actions/upload-release-asset@v1.0.1
+      - name: Release Artifact [linux/amd64]
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
@@ -94,7 +104,8 @@ jobs:
           asset_name: foodhubber-${{ github.ref_name }}-linux-amd64.tar.gz
           asset_content_type: application/gzip
 
-      - uses: actions/upload-release-asset@v1.0.1
+      - name: Release Artifact [linux/arm64]
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
@@ -103,7 +114,8 @@ jobs:
           asset_name: foodhubber-${{ github.ref_name }}-linux-arm64.tar.gz
           asset_content_type: application/gzip
 
-      - uses: actions/upload-release-asset@v1.0.1
+      - name: Release Artifact [darwin/arm64]
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
@@ -112,7 +124,8 @@ jobs:
           asset_name: foodhubber-${{ github.ref_name }}-darwin-arm64.zip
           asset_content_type: application/zip
 
-      - uses: actions/upload-release-asset@v1.0.1
+      - name: Release Artifact [darwin/amd64]
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
@@ -121,7 +134,8 @@ jobs:
           asset_name: foodhubber-${{ github.ref_name }}-darwin-amd64.zip
           asset_content_type: application/zip
 
-      - uses: actions/upload-release-asset@v1.0.1
+      - name: Release Artifact [windows/amd64]
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
