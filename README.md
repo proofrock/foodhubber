@@ -10,7 +10,7 @@ This project is sponsored by [Emergency ONG Onlus](https://emergency.it) and [At
 
 This project is released as Free and Open Source Software under the [GPLv3 license](https://www.gnu.org/licenses/quick-guide-gplv3.it.html).
 
-**NOTE**: The development is currently happening in the `develop` branch. The first versions will be italian only.
+**NOTE**: The first versions will be italian only.
 
 ## Installazione (ita)
 
