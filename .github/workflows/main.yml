@@ -18,7 +18,7 @@ jobs:
 
       - name: Modify version
         run: sed -i 's/v0\.0\.0/${{ github.ref_name }}/g' globals.go
-        working-directory: src/params
+        working-directory: backend/params
 
       - name: Database generation
         run: |
