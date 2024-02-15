@@ -1,3 +1,5 @@
+[![Build and Draft Release](https://github.com/proofrock/foodhubber/actions/workflows/main.yml/badge.svg)](https://github.com/proofrock/foodhubber/actions/workflows/main.yml)
+
 # FoodHubber
 
 <img src="https://eventi.emergency.it/wp-content/uploads/cropped-favicon.png" alt="Emergency" width="200"/>
