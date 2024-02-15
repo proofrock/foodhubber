@@ -154,12 +154,12 @@ func GetBeneficiaryReport(c *fiber.Ctx) error {
 		for i := 0; i < len(ret.Allowance); i++ {
 			if i*2+1 < len(allowances) {
 				ret.Allowance[i] = allowanceForReport{
-					Item1: allowances[i*2].Item, Residual1: fmt.Sprint(allowances[1*2].Residual),
-					Item2: allowances[i*2+1].Item, Residual2: fmt.Sprint(allowances[1*2+1].Residual),
+					Item1: allowances[i*2].Item, Residual1: fmt.Sprint(allowances[i*2].Residual),
+					Item2: allowances[i*2+1].Item, Residual2: fmt.Sprint(allowances[i*2+1].Residual),
 				}
 			} else {
 				ret.Allowance[i] = allowanceForReport{
-					Item1: allowances[i*2].Item, Residual1: fmt.Sprint(allowances[1*2].Residual),
+					Item1: allowances[i*2].Item, Residual1: fmt.Sprint(allowances[i*2].Residual),
 				}
 			}
 		}
