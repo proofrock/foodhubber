@@ -97,5 +97,6 @@ func main() {
 	app.Post("/api/setStock", set_stock.SetStock)
 
 	fmt.Println("  - server on port", params.Port)
+	fmt.Printf("  - all ok. Please open http://localhost:%d\n", params.Port)
 	app.Listen(fmt.Sprintf(":%d", params.Port))
 }
