@@ -69,7 +69,7 @@ func GetStockExcel(c *fiber.Ctx) error {
 	}
 
 	// FIXME i18n (passed by the browser)
-	f.SetCellValue("Sheet1", "A1", fmt.Sprintf("Report delle giacenze, %s", time.Now().Format("02/01/2006, 15:04:05")))
+	f.SetCellValue("Sheet1", "A1", fmt.Sprintf("Report delle scorte, %s", time.Now().Format("02/01/2006, 15:04:05")))
 	err = f.MergeCell("Sheet1", "A1", "C1")
 	if err != nil {
 		return utils.SendError(c, fiber.StatusInternalServerError, "FHE010", "", &err)

@@ -110,7 +110,7 @@
             Object.keys(residuals).forEach((key) => {
                 if (residuals[key] < 0)
                     _errors.push(
-                        `L'ordine per la categoria '${key}' è inferiore a quanto permesso.`,
+                        `L'ordinato per la categoria '${key}' è superiore a quanto previsto.`,
                     );
             });
 
