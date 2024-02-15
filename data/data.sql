@@ -167,4 +167,5 @@ VALUES
 
 INSERT INTO beneficiaries
 (id, profile)
-VALUES('123', 'A1');
+VALUES
+('123', 'A1');
