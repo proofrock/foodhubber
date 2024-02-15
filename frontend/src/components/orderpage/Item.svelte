@@ -18,13 +18,13 @@
      * along with FoodHubber.  If not, see <http://www.gnu.org/licenses/>.
      */
 
-    import { onMount } from "svelte";
     import { createEventDispatcher } from "svelte";
     import { IS_EL_IN_VIEWPORT } from "../utils/Utils.svelte";
 
     const dispatch = createEventDispatcher();
 
     export let itm;
+    export let limit;
     export let selItem;
     export let order;
 
@@ -40,7 +40,7 @@
             if (qty <= 0) return;
             dispatch("decrease", itm.id);
         } else {
-            if (max >= 0 && qty >= max) return;
+            if (limit >= 0 && qty >= limit) return;
             dispatch("increase", itm.id);
         }
     }
@@ -57,14 +57,6 @@
                 cell.scrollIntoView({ block: "end", behavior: "smooth" });
         }
     }
-
-    let max = -1;
-
-    onMount(async () => {
-        max = order.allowance.hasOwnProperty(itm.item)
-            ? order.allowance[itm.item]
-            : -1;
-    });
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -96,8 +88,8 @@
             {/if}
         </span>
         <span class="right">
-            {#if max >= 0}
-                Rim.: {order.allowance[itm.item]}
+            {#if limit >= 0}
+                Lim.: {limit}
             {/if}
         </span>
     </div>

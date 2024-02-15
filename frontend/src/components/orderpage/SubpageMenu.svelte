@@ -34,28 +34,12 @@
     $: rows = [];
     $: selItem = 0;
     $: selectedSection = null;
+    $: residualAllowance = {};
 
     const chart = new Map(); // a chart of the grid: for every item [id], its coordinates
     const rowsMap = new Map(); // map of the sections
 
     function rearrangeCols(colNum) {
-        /* To order by column
-        function compose(_list, _dest) {
-            let rowNum = Math.ceil(_list.length / colNum);
-            let lenOfLastRow = _list.length - colNum * (rowNum - 1);
-            let i = 0;
-            for (let r = 0; r < rowNum - 1; r++) _dest.push(new Array(colNum));
-            _dest.push(new Array(lenOfLastRow));
-            for (let c = 0; c < colNum; c++)
-                for (let r = 0; r < rowNum; r++)
-                    if (r < rowNum - 1 || c < lenOfLastRow) {
-                        _dest[r][c] = _list[i];
-                        chart.set(_list[i].id, { r: r, c: c });
-                        i++;
-                    }
-        }
-        */
-
         function compose(_list, _dest) {
             for (let i = 0; i < _list.length; i += colNum)
                 _dest.push(_list.slice(i, i + colNum));
@@ -116,6 +100,20 @@
         MAT_ENABLE_FAB();
         window.addEventListener("resize", resized);
 
+        for (let i = 0; i < initData.items.length; i++) {
+            const item = initData.items[i];
+            if (!!order.allowance[item.item])
+                residualAllowance[item.id.toString()] = {
+                    limit: order.allowance[item.item],
+                    item: item.item,
+                };
+            else
+                residualAllowance[item.id.toString()] = {
+                    limit: -1,
+                    item: "",
+                };
+        }
+
         resized();
     });
 
@@ -123,16 +121,30 @@
         window.removeEventListener("resize", resized);
     });
 
+    function recalcResidualAllowance(id, increment) {
+        for (const [_id, _obj] of Object.entries(residualAllowance))
+            if (
+                _obj.item === initData.itemsMap.get(id).item &&
+                _id !== id.toString()
+            )
+                residualAllowance[_id].limit += increment;
+        return residualAllowance;
+    }
+
     function increase(data) {
-        const id = data.detail.toString();
-        order.items[id]++;
-        selItem = data.detail;
+        const id = data.detail;
+        order.items[id.toString()]++;
+        selItem = id;
+
+        residualAllowance = recalcResidualAllowance(id, -1);
     }
 
     function decrease(data) {
-        const id = data.detail.toString();
-        if (order.items[id] > 0) order.items[id]--;
-        selItem = data.detail;
+        const id = data.detail;
+        order.items[id.toString()]--;
+        selItem = id;
+
+        residualAllowance = recalcResidualAllowance(id, +1);
     }
 
     function key(evt) {
@@ -183,6 +195,9 @@
                             <Item
                                 itm={item}
                                 bind:selItem
+                                bind:limit={residualAllowance[
+                                    item.id.toString()
+                                ].limit}
                                 {order}
                                 on:increase={increase}
                                 on:decrease={decrease}
@@ -217,6 +232,9 @@
                                     <Item
                                         itm={item}
                                         bind:selItem
+                                        bind:limit={residualAllowance[
+                                            item.id.toString()
+                                        ].limit}
                                         {order}
                                         on:increase={increase}
                                         on:decrease={decrease}
