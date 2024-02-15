@@ -16,6 +16,10 @@ jobs:
       - name: Build dir generation
         run: mkdir bin/
 
+      - name: Modify version
+        run: sed -i 's/v0\.0\.0/${{ github.ref_name }}/g' globals.go
+        working-directory: src/params
+
       - name: Database generation
         run: |
           sqlite3 ../backend/foodhubber.db < structure.sql
