@@ -68,6 +68,10 @@
         if (curColNum >= 3) {
             // No sections
             compose(initData.items, nuRows);
+
+            for (let i = 0; i < rows.length; i++)
+                for (let j = 0; j < rows[i].length; j++)
+                    chart.set(rows[i][j].id, { r: i, c: j });
         } else {
             // Sections
             for (let i = 0; i < initData.item_types.length; i++) {
@@ -80,14 +84,18 @@
                         selectedSection = item_type.id;
                     const filteredRows = [];
                     compose(filtered_list, filteredRows);
-                    const row = {
+                    const section = {
                         id: item_type.id,
                         title: `Gruppo ${item_type.id}`,
                         color: item_type.color,
                         rows: filteredRows,
                     };
-                    nuRows.push(row);
-                    nuRowsMap.set(row.id, row);
+                    nuRows.push(section);
+                    nuRowsMap.set(section.id, section);
+
+                    for (let i = 0; i < filteredRows.length; i++)
+                        for (let j = 0; j < filteredRows[i].length; j++)
+                            chart.set(filteredRows[i][j].id, { r: i, c: j });
                 }
             }
         }
