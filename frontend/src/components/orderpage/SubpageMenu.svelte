@@ -120,17 +120,13 @@
         const id = data.detail.toString();
         order.items[id]++;
         selItem = data.detail;
-        isTypingInCell = false;
     }
 
     function decrease(data) {
         const id = data.detail.toString();
         if (order.items[id] > 0) order.items[id]--;
         selItem = data.detail;
-        isTypingInCell = false;
     }
-
-    let isTypingInCell = false;
 
     function key(evt) {
         if (evt.keyCode >= 37 && evt.keyCode <= 40) {
@@ -150,27 +146,9 @@
         } else if (evt.keyCode === 32) {
             // Spacebar
             order.items[selItem.toString()]++;
-            isTypingInCell = false;
-        } else if (evt.keyCode === 46) {
-            // Del
+        } else if (evt.keyCode === 46 || evt.keyCode === 8) {
+            // Del or Backspace
             order.items[selItem.toString()] = 0;
-        } else if (evt.keyCode === 8) {
-            // Backspace
-            if (isTypingInCell)
-                order.items[selItem.toString()] = Math.floor(
-                    order.items[selItem.toString()] / 10,
-                );
-            else order.items[selItem.toString()] = 0;
-        } else if (evt.keyCode >= 48 && evt.keyCode <= 57) {
-            // 0-9
-            const number = evt.keyCode - 48;
-            if (isTypingInCell) {
-                order.items[selItem.toString()] *= 10;
-                order.items[selItem.toString()] += number;
-            } else {
-                order.items[selItem.toString()] = number;
-                isTypingInCell = true;
-            }
         }
     }
 
