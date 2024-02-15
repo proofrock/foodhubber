@@ -32,11 +32,11 @@
     export let initData;
 
     $: rows = [];
-    let rowsMap = new Map();
     $: selItem = 0;
     $: selectedSection = null;
 
     const chart = new Map(); // a chart of the grid: for every item [id], its coordinates
+    const rowsMap = new Map(); // map of the sections
 
     function rearrangeCols(colNum) {
         /* To order by column
@@ -61,17 +61,17 @@
                 _dest.push(_list.slice(i, i + colNum));
         }
 
-        chart.clear();
         const nuRows = [];
-        const nuRowsMap = new Map();
+        chart.clear();
+        rowsMap.clear();
         selectedSection = null;
         if (curColNum >= 3) {
             // No sections
             compose(initData.items, nuRows);
 
-            for (let i = 0; i < rows.length; i++)
-                for (let j = 0; j < rows[i].length; j++)
-                    chart.set(rows[i][j].id, { r: i, c: j });
+            for (let i = 0; i < nuRows.length; i++)
+                for (let j = 0; j < nuRows[i].length; j++)
+                    chart.set(nuRows[i][j].id, { r: i, c: j });
         } else {
             // Sections
             for (let i = 0; i < initData.item_types.length; i++) {
@@ -91,7 +91,7 @@
                         rows: filteredRows,
                     };
                     nuRows.push(section);
-                    nuRowsMap.set(section.id, section);
+                    rowsMap.set(section.id, section);
 
                     for (let i = 0; i < filteredRows.length; i++)
                         for (let j = 0; j < filteredRows[i].length; j++)
@@ -100,7 +100,6 @@
             }
         }
         rows = nuRows;
-        rowsMap = nuRowsMap;
     }
 
     let curColNum = -1;
