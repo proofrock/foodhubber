@@ -68,10 +68,10 @@ func GetOrders(c *fiber.Ctx) error {
 
 	query := `
 			SELECT MAX(1, CEIL(COUNT(1) / (SELECT value FROM configs WHERE key = 'order_list_page_size'))) AS pages
-			FROM orders
-			WHERE active = 1`
+			  FROM orders
+			 WHERE active = 1`
 	if filter != "" {
-		query += " AND (id = $1 || beneficiary_id = $2 || checkout_id LIKE '%' + $3 + '%' || operator LIKE '%' + $4 + '%')"
+		query += " AND (id = $1 OR beneficiary_id = $2 OR checkout_id LIKE '%' + $3 + '%' OR operator LIKE '%' + $4 + '%')"
 		row = params.Db.QueryRow(query, filter, filter, filter, filter)
 	} else {
 		row = params.Db.QueryRow(query)
@@ -87,8 +87,8 @@ func GetOrders(c *fiber.Ctx) error {
 			SELECT id, checkout_id, operator, beneficiary_id, note, strftime('%Y%m%dT%H%M%S', datetime) AS datetime
 		      FROM orders
 	         WHERE active = 1
-			   AND (id = $1 || beneficiary_id = $2
-			        || checkout_id LIKE '%' + $3 + '%' || operator LIKE '%' + $4 + '%')
+			   AND (id = $1 OR beneficiary_id = $2
+			        OR checkout_id LIKE '%' + $3 + '%' OR operator LIKE '%' + $4 + '%')
 	         ORDER BY id DESC
              LIMIT (SELECT value FROM configs WHERE key = 'order_list_page_size')
             OFFSET ($5 - 1) * (SELECT value FROM configs WHERE key = 'order_list_page_size')`
