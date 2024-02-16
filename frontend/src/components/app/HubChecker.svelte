@@ -80,7 +80,7 @@
             map["pos"] = _checkout.id;
             map["op"] = _checkout.cashier;
         }
-        const res = await CALL("doCycle", "POST", null, map);
+        const res = await CALL("doCycle", "POST", null, map, 1000);
         signalErrorOnServer(res.isErr);
         if (!res.isErr) {
             const ret = res.payload;

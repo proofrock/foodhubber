@@ -106,11 +106,15 @@
         method = "GET",
         json = null,
         map = null,
+        timeout = 5000,
     ) {
         let url = url_prefix + "/" + srv;
         if (!!map) url += mapToUrl(map);
 
-        const req = { method: method };
+        const req = {
+            method: method,
+            signal: AbortSignal.timeout(timeout),
+        };
         if (method === "PUT" || method === "POST") {
             req["body"] = !!json ? JSON.stringify(json) : "{}";
             req["headers"] = { "Content-Type": "application/json" };
