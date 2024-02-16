@@ -92,8 +92,6 @@
         SUB_STOCK_CHANGES(fetchData);
         await fetchData();
         MAT_ENABLE_SELECT();
-        if (data.length > 0)
-            TOAST("Fai click su un ingrediente<br>per impostare la scorta.");
     });
 
     onDestroy(() => {
@@ -143,17 +141,23 @@
                 <tr>
                     <th />
                     <th>Scorta Rimanente</th>
+                    <th>&nbsp;</th>
                 </tr>
                 {#each dataFiltered as ing (ing.id)}
-                    <tr
-                        on:click={() => {
-                            selectedRow =
-                                ing.id === selectedRow ? null : ing.id;
-                        }}
-                        class={ing.class}
-                    >
+                    <tr class={ing.class}>
                         <td>{ing.name}</td>
                         <td>{ing.stock}</td>
+                        <td
+                            on:click={() => {
+                                selectedRow =
+                                    ing.id === selectedRow ? null : ing.id;
+                            }}
+                            ><i class="material-icons"
+                                >expand_{ing.id === selectedRow
+                                    ? "less"
+                                    : "more"}</i
+                            ></td
+                        >
                     </tr>
                     {#if selectedRow === ing.id}
                         <tr>

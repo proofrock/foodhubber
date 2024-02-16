@@ -35,7 +35,6 @@
         UNSUB_ORDERS_CHANGES,
     } from "./app/HubChecker.svelte";
     import SpaceForFabs from "./app/SpaceForFabs.svelte";
-    import { TOAST } from "./utils/Utils.svelte";
 
     export let initData;
 
@@ -96,9 +95,6 @@
         SUB_ORDERS_CHANGES(reload);
         MAT_ENABLE_DROPDOWN();
         await reload();
-        if (!!data)
-            // FIXME perché *a volte* viene mostrato n volte o proprio mai?
-            TOAST("Fai click su un ordine<br>per ulteriori opzioni.");
     });
 
     onDestroy(() => {
@@ -203,14 +199,10 @@
                     <th>Beneficiario</th>
                     <th class="hide-on-small-only">Data/ora</th>
                     <th class="hide-on-med-and-up">Ora</th>
+                    <th>&nbsp;</th>
                 </tr>
                 {#each data as order (order.id)}
-                    <tr
-                        class="row"
-                        on:click={() => {
-                            id_open = id_open === order.id ? -1 : order.id;
-                        }}
-                    >
+                    <tr class="row">
                         <td>{order.id}</td>
                         <td>{order.checkout}</td>
                         <td class="hide-on-med-and-down">{order.cashier}</td>
@@ -229,6 +221,16 @@
                         >
                         <td class="hide-on-med-and-up"
                             >{FORMAT_TIME(order.tstamp)}</td
+                        >
+                        <td
+                            on:click={() => {
+                                id_open = id_open === order.id ? -1 : order.id;
+                            }}
+                            ><i class="material-icons"
+                                >expand_{id_open === order.id
+                                    ? "less"
+                                    : "more"}</i
+                            ></td
                         >
                     </tr>
                     {#if id_open === order.id}
