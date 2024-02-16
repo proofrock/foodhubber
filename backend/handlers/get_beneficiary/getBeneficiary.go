@@ -29,8 +29,9 @@ import (
 )
 
 type order struct {
-	ID   int    `json:"id"`
-	Date string `json:"date"`
+	ID       int    `json:"id"`
+	Date     string `json:"date"`
+	ThisWeek bool   `json:"thisWeek"`
 }
 
 type allowance struct {
@@ -60,7 +61,8 @@ func GetBeneficiary(c *fiber.Ctx) error {
 	defer params.RWLock.RUnlock()
 
 	query := `
-		SELECT id, strftime('%Y%m%dT%H%M%S', datetime) AS datetime
+		SELECT id, strftime('%Y%m%dT%H%M%S', datetime) AS datetime,
+		       datetime >= DATE(DATETIME('now', 'localtime'), 'weekday 1', '-7 days') || ' 00:00:00' AS inThisWeek
 		  FROM orders 
 		 WHERE beneficiary_id = $1 
 		   AND active = 1
@@ -68,7 +70,7 @@ func GetBeneficiary(c *fiber.Ctx) error {
 		 LIMIT 1`
 	row := params.Db.QueryRow(query, id)
 	var lastOrder order
-	if err := row.Scan(&lastOrder.ID, &lastOrder.Date); err != nil && err != sql.ErrNoRows {
+	if err := row.Scan(&lastOrder.ID, &lastOrder.Date, &lastOrder.ThisWeek); err != nil && err != sql.ErrNoRows {
 		return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "orders", &err)
 	} else if err == nil {
 		ret.LastOrder = &lastOrder

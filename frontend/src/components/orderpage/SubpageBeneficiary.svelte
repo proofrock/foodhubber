@@ -18,7 +18,12 @@
      * along with FoodHubber.  If not, see <http://www.gnu.org/licenses/>.
      */
 
-    import { ALERT_ERROR, FORMAT_DATE_TIME, CALL } from "../utils/Utils.svelte";
+    import {
+        ALERT_ERROR,
+        FORMAT_DATE_TIME,
+        CALL,
+        B2S,
+    } from "../utils/Utils.svelte";
     import Divider from "./Divider.svelte";
     import SpaceForFabs from "../app/SpaceForFabs.svelte";
 
@@ -81,7 +86,7 @@
                 </tr>
                 <tr>
                     <td>Abilitato per questa settimana</td>
-                    <td>{details.enabledForWeek ? "Sì" : "No"}</td>
+                    <td>{B2S(details.enabledForWeek)}</td>
                 </tr>
                 <tr>
                     <td>Ultimo ordine</td>
@@ -92,8 +97,12 @@
                 </tr>
                 {#if !!details.lastOrder}
                     <tr>
-                        <td>&nbsp;del</td>
+                        <td>+ in data</td>
                         <td>{FORMAT_DATE_TIME(details.lastOrder.date)}</td>
+                    </tr>
+                    <tr>
+                        <td>+ sett. corrente</td>
+                        <td>{B2S(details.lastOrder.thisWeek)}</td>
                     </tr>
                 {/if}
                 <tr>

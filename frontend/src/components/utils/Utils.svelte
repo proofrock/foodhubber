@@ -307,4 +307,8 @@
     export const IS_INTEGER = function (obj) {
         return Number.isInteger(parseFloat(obj));
     };
+
+    export const B2S = function (b) {
+        return b ? "Sì" : "No";
+    };
 </script>
