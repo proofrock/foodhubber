@@ -25,7 +25,7 @@ func vacuum(allowToPanic bool) {
 
 func StartVacuum() {
 	vacuum(true)
-	for range time.Tick((vacuum_period * time.Second)) {
+	for range time.Tick((vacuum_period * time.Minute)) {
 		vacuum(false)
 	}
 }
