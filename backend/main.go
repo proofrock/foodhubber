@@ -34,6 +34,7 @@ import (
 	"foodhubber/handlers/get_stats"
 	"foodhubber/handlers/get_stock"
 	"foodhubber/handlers/put_order"
+	"foodhubber/handlers/set_beneficiaries_excel"
 	"foodhubber/handlers/set_stock"
 	"foodhubber/params"
 	"foodhubber/utils"
@@ -103,6 +104,7 @@ func main() {
 	app.Get("/api/getStock", get_stock.GetStock)
 	app.Get("/api/getStockExcel", get_stock.GetStockExcel)
 	app.Put("/api/putOrder", put_order.PutOrder)
+	app.Post("/api/setBeneficiariesExcel", set_beneficiaries_excel.SetBeneficiariesExcel)
 	app.Post("/api/setStock", set_stock.SetStock)
 
 	fmt.Println("  - server on port", params.Port)

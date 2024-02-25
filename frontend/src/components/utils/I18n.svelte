@@ -14,10 +14,13 @@
             FHE011: "errore nello scaricare l'excel",
             FHE012: "errore nel comporre il report",
             FHE013: "errore nel preparare uno statement",
+            FHE014: "errore nel caricare l'excel",
+            FHE015: "errore nel decodificare l'excel",
             FHE100: "l'ordine non ha righe",
             FHE101: "la nota è troppo lunga",
             FHE102: "ordine non trovato",
             FHE103: "almeno un articolo supera la disponibilità da regole di profilo",
+            FHE200: "impossibile trovare le intestazioni corrette nell'excel",
         },
         en: {
             FHE001: "cannot read from %s",
@@ -33,10 +36,13 @@
             FHE011: "error in downloading excel",
             FHE012: "error in composing report",
             FHE013: "error in prepararing a statement",
+            FHE014: "error in uploading excel",
+            FHE015: "error in processing excel",
             FHE100: "order has no rows",
             FHE101: "note is too long",
             FHE102: "order not found",
             FHE103: "at least one item is not available due to profile rules",
+            FHE200: "cannot find correct headers in the excel data",
         },
     };
 </script>

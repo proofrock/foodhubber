@@ -6,7 +6,7 @@ build-db:
 	- cd env/ && rm foodhubber.db
 	cd env/ && sqlite3 foodhubber.db < ../data/structure.sql
 	cd env/ && sqlite3 foodhubber.db < ../data/data.sql
-	cd env/ && ls ../data/data-private.sql && sqlite3 foodhubber.db < ../data/data-private.sql
+	- cd env/ && sqlite3 foodhubber.db < ../data/data-private.sql
 
 build:
 	cd frontend && npm install && npm run build

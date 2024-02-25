@@ -19,10 +19,12 @@
      */
 
     import {
+        ALERT_INFO,
         ALERT_ERROR,
         CALL,
         FORMAT_DATE_TIME,
     } from "../components/utils/Utils.svelte";
+    import { ERR } from "../components/utils/I18n.svelte";
     import { onDestroy, onMount } from "svelte";
 
     export let initData = null;
@@ -44,15 +46,78 @@
     onDestroy(() => {
         if (interval !== null) clearInterval(interval);
     });
+
+    async function handleSubmitBenefExcel(e) {
+        const form = e.currentTarget;
+        const url = new URL(form.action);
+        // @ts-ignore
+        let file = document.getElementById("uplBenefXls").files[0];
+        if (!file) {
+            await ALERT_ERROR(`<p>Scegliere un file.</p>`);
+            return;
+        }
+        let formData = new FormData();
+
+        formData.append("file", file);
+
+        const fetchOptions = {
+            method: form.method,
+            body: formData,
+        };
+
+        const res = await fetch(url, fetchOptions);
+        if (res.status === 200) {
+            await ALERT_INFO("<p>Ok, dati caricati.</p>");
+        } else {
+            const err = await res.json();
+            let msg = ERR.it[err.code];
+            msg = msg.charAt(0).toUpperCase() + msg.slice(1);
+            if (msg.includes("%s")) msg = msg.replace("%s", err.object);
+            if (!!err.error)
+                console.error("!!ERROR!!" + msg + ": " + err.error);
+            await ALERT_ERROR(`<p>${msg}.</p>`);
+        }
+    }
 </script>
 
-<div class="row">&nbsp;</div>
+<div>&nbsp;</div>
+<div class="row">
+    <div class="col hide-on-med-and-down s1 m2 l3 xl4" />
+    <div class="center col s10 m8 l6 xl4">
+        <div>&nbsp;</div>
+
+        <h5 class="center">Caricamento Excel dei beneficiari</h5>
+        <div>&nbsp;</div>
+        <form
+            method="post"
+            enctype="multipart/form-data"
+            action="/api/setBeneficiariesExcel"
+            on:submit|preventDefault={handleSubmitBenefExcel}
+        >
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>File</span>
+                    <input type="file" id="uplBenefXls" />
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path" type="text" />
+                </div>
+            </div>
+            <button class="waves-effect waves-light btn green" type="submit"
+                >Carica</button
+            >
+        </form>
+    </div>
+    <div class="col hide-on-med-and-down s1 m2 l3 xl4" />
+</div>
 {#if data !== null}
+    <div>&nbsp;</div>
+    <div class="divider">&nbsp;</div>
     <div class="row">
         <div class="col hide-on-med-and-down m1 l2 xl3" />
         <div class="input-field col s12 m10 l8 xl6">
-            <h6>Client Connessi</h6>
-            <div class="divider" />
+            <h5 class="center">Client Connessi</h5>
+            <div>&nbsp;</div>
             <table>
                 {#each data.checkouts as checkout (checkout.id)}
                     <tr>
@@ -76,4 +141,5 @@
         </div>
         <div class="col hide-on-med-and-down m1 l2 xl3" />
     </div>
+    <div class="row">&nbsp;</div>
 {/if}
