@@ -28,3 +28,4 @@ update:
 clean:
 	rm -rf frontend/node_modules
 	- rm env/foodhubber*
+	- rm -rf env/backups

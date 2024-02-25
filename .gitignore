@@ -1,3 +1,5 @@
 foodhubber
 foodhubber.upx
 foodhubber.db
+backups/
+env/backups

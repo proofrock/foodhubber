@@ -21,6 +21,7 @@ package set_stock
 import (
 	"context"
 	"database/sql"
+	"foodhubber/backup"
 	"foodhubber/params"
 	"foodhubber/utils"
 	"strconv"
@@ -42,6 +43,7 @@ func SetStock(c *fiber.Ctx) error {
 		return utils.SendError(c, fiber.StatusBadRequest, "FHE006", "body", &err)
 	}
 
+	defer func() { go backup.Backup() }()
 	params.RWLock.Lock()
 	defer params.RWLock.Unlock()
 

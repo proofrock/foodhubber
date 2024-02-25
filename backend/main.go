@@ -22,6 +22,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+	"foodhubber/backup"
 	"foodhubber/flags"
 	"foodhubber/handlers/del_order"
 	"foodhubber/handlers/del_session"
@@ -70,6 +71,16 @@ func main() {
 	if dbVersion != DB_VERSION {
 		utils.Abort("DB version is %d but should be %d. Please upgrade the database or the application.", dbVersion, DB_VERSION)
 	}
+
+	// VACUUM
+
+	if _, err := params.Db.Exec("VACUUM"); err != nil {
+		panic(err)
+	}
+
+	// Backup
+
+	backup.Backup()
 
 	// server
 

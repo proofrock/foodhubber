@@ -21,6 +21,7 @@ package put_order
 import (
 	"context"
 	"fmt"
+	"foodhubber/backup"
 	"foodhubber/params"
 	"foodhubber/utils"
 	"time"
@@ -60,6 +61,7 @@ func PutOrder(c *fiber.Ctx) error {
 		return utils.SendError(c, fiber.StatusBadRequest, "FHE101", "", nil)
 	}
 
+	defer func() { go backup.Backup() }()
 	params.RWLock.Lock()
 	defer params.RWLock.Unlock()
 
