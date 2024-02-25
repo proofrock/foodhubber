@@ -10,7 +10,7 @@ build-db:
 
 build:
 	cd frontend && npm install && npm run build
-	cd backend && CGO=0 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -trimpath -o foodhubber && mv foodhubber ../env/
+	cd backend && CGO_ENABLED=0 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -trimpath -o foodhubber && mv foodhubber ../env/
 
 zbuild:
 	make build

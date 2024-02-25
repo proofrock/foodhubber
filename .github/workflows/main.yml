@@ -13,6 +13,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.0'
+
       - name: Build dir generation
         run: mkdir bin/
 
@@ -36,35 +40,35 @@ jobs:
 
       - name: Compile Backend [linux/amd64]
         run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -trimpath
           tar czf ../bin/foodhubber-${{ github.ref_name }}-linux-amd64.tar.gz foodhubber foodhubber.db
           rm foodhubber
         working-directory: backend/
 
       - name: Compile Backend [linux/arm64]
         run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -trimpath
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -trimpath
           tar czf ../bin/foodhubber-${{ github.ref_name }}-linux-arm64.tar.gz foodhubber foodhubber.db
           rm foodhubber
         working-directory: backend/
 
       - name: Compile Backend [darwin/amd64]
         run: |
-          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -trimpath
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -trimpath
           zip -9 ../bin/foodhubber-${{ github.ref_name }}-darwin-arm64.zip foodhubber foodhubber.db
           rm foodhubber
         working-directory: backend/
 
       - name: Compile Backend [darwin/amd64]
         run: |
-          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -trimpath
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -trimpath
           zip -9 ../bin/foodhubber-${{ github.ref_name }}-darwin-amd64.zip foodhubber foodhubber.db
           rm foodhubber
         working-directory: backend/
 
       - name: Compile Backend [windows/amd64]
         run: |
-          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -trimpath
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -trimpath
           zip -9 ../bin/foodhubber-${{ github.ref_name }}-win-amd64.zip foodhubber.exe foodhubber.db
           rm foodhubber.exe
         working-directory: backend/
