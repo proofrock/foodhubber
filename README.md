@@ -16,7 +16,7 @@ This project is released as Free and Open Source Software under the [GPLv3 licen
 
 ## Installazione (ita)
 
-- [Scaricare](https://github.com/proofrock/foodhubber/releases) il pacchetto per la propria architettura (es. `foodhubber-v0.2.0-win-amd64.zip`);
+- [Scaricare](https://github.com/proofrock/foodhubber/releases) il pacchetto per la propria architettura (es. `foodhubber-v0.3.0-win-amd64.zip`);
 - scompattarlo in una directory;
 - avviare l'eseguibile;
 - di default cerca il database nella directory di esecuzione;
