@@ -22,7 +22,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
-	"foodhubber/backup"
+	"foodhubber/db_ops"
 	"foodhubber/flags"
 	"foodhubber/handlers/del_order"
 	"foodhubber/handlers/del_session"
@@ -74,13 +74,11 @@ func main() {
 
 	// VACUUM
 
-	if _, err := params.Db.Exec("VACUUM"); err != nil {
-		panic(err)
-	}
+	go db_ops.StartVacuum()
 
 	// Backup
 
-	backup.Backup()
+	db_ops.Backup()
 
 	// server
 
