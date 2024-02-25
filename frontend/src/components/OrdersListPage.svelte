@@ -37,6 +37,7 @@
     import SpaceForFabs from "./app/SpaceForFabs.svelte";
 
     export let initData;
+    export let canDelete;
 
     $: page = 1;
     $: numPages = 0;
@@ -149,6 +150,8 @@
     }
 
     async function del() {
+        if (!canDelete) return;
+
         if (
             id_open < 0 ||
             !(await DIALOG_CONFIRM("Vuoi davvero cancellare quest'ordine?"))
@@ -241,14 +244,20 @@
                             </td>
                             <td>&nbsp;</td>
                             <td>
-                                <a
-                                    class="btn red"
-                                    href="#!"
-                                    on:click={del}
-                                    title="Cancella ordine"
-                                >
-                                    <i class="material-icons">delete_forever</i>
-                                </a>
+                                {#if canDelete}
+                                    <a
+                                        class="btn red"
+                                        href="#!"
+                                        on:click={del}
+                                        title="Cancella ordine"
+                                    >
+                                        <i class="material-icons"
+                                            >delete_forever</i
+                                        >
+                                    </a>
+                                {:else}
+                                    &nbsp;
+                                {/if}
                             </td>
                         </tr>
                     {/if}

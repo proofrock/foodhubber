@@ -36,8 +36,10 @@ type item struct {
 type checkout struct {
 	ID                     string  `json:"id"`
 	CanAccessOrderListPage bool    `json:"can_access_order_list_page"`
+	CanDeleteOrders        bool    `json:"can_delete_orders"`
 	CanAccessStatsPage     bool    `json:"can_access_stats_page"`
 	CanAccessStockPage     bool    `json:"can_access_stock_page"`
+	CanChangeStock         bool    `json:"can_change_stock"`
 	CanAccessConsolePage   bool    `json:"can_access_console_page"`
 	Password               *string `json:"password"`
 }
@@ -100,8 +102,8 @@ func GetInitData(c *fiber.Ctx) error {
 	}
 
 	sql = `
-		SELECT id, can_access_order_list_page, can_access_stats_page, can_access_stock_page, can_access_console_page,
-		       password_hash
+		SELECT id, can_access_order_list_page, can_delete_orders, can_access_stats_page, 
+		       can_access_stock_page, can_change_stock, can_access_console_page, password_hash
           FROM checkouts
 		 WHERE active = 1
 		 ORDER BY pos ASC`
@@ -112,15 +114,17 @@ func GetInitData(c *fiber.Ctx) error {
 	defer rows.Close()
 	for rows.Next() {
 		var checkout checkout
-		var v1, v2, v3, v4 int
-		err = rows.Scan(&checkout.ID, &v1, &v2, &v3, &v4, &checkout.Password)
+		var v1, v2, v3, v4, v5, v6 int
+		err = rows.Scan(&checkout.ID, &v1, &v2, &v3, &v4, &v5, &v6, &checkout.Password)
 		if err != nil {
 			return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "checkouts", &err)
 		}
 		checkout.CanAccessOrderListPage = utils.Int2Bool(v1)
-		checkout.CanAccessStatsPage = utils.Int2Bool(v2)
-		checkout.CanAccessStockPage = utils.Int2Bool(v3)
-		checkout.CanAccessConsolePage = utils.Int2Bool(v4)
+		checkout.CanDeleteOrders = utils.Int2Bool(v2)
+		checkout.CanAccessStatsPage = utils.Int2Bool(v3)
+		checkout.CanAccessStockPage = utils.Int2Bool(v4)
+		checkout.CanChangeStock = utils.Int2Bool(v5)
+		checkout.CanAccessConsolePage = utils.Int2Bool(v6)
 		ret.Checkouts = append(ret.Checkouts, checkout)
 	}
 	if err = rows.Err(); err != nil {

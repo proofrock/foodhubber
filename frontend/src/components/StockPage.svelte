@@ -33,6 +33,7 @@
     } from "./app/HubChecker.svelte";
 
     export let initData;
+    export let canChangeStock;
 
     $: data = null;
     $: dataFiltered = null;
@@ -99,6 +100,7 @@
     });
 
     async function setStock(item, stock) {
+        if (!canChangeStock) return;
         const ret = await CALL("setStock", "POST", { item, stock });
         if (ret.isErr)
             await ALERT_ERROR(`<p>Modifica fallita.</p><p>${ret.message}.</p>`);
@@ -147,19 +149,23 @@
                     <tr class={ing.class}>
                         <td>{ing.name}</td>
                         <td>{ing.stock}</td>
-                        <td
-                            on:click={() => {
-                                selectedRow =
-                                    ing.id === selectedRow ? null : ing.id;
-                            }}
-                            ><i class="material-icons"
-                                >expand_{ing.id === selectedRow
-                                    ? "less"
-                                    : "more"}</i
-                            ></td
-                        >
+                        {#if canChangeStock}
+                            <td
+                                on:click={() => {
+                                    selectedRow =
+                                        ing.id === selectedRow ? null : ing.id;
+                                }}
+                                ><i class="material-icons"
+                                    >expand_{ing.id === selectedRow
+                                        ? "less"
+                                        : "more"}</i
+                                ></td
+                            >
+                        {:else}
+                            <td>&nbsp;</td>
+                        {/if}
                     </tr>
-                    {#if selectedRow === ing.id}
+                    {#if canChangeStock && selectedRow === ing.id}
                         <tr>
                             <td colspan="2">
                                 &nbsp;&nbsp;&nbsp;

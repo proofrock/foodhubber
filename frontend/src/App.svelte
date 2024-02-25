@@ -143,11 +143,11 @@
     {:else if page === PAGES.ORDER}
       <OrderPage {initData} bind:beneficiary {checkout} />
     {:else if page === PAGES.ORDERS_LIST}
-      <OrdersListPage {initData} />
+      <OrdersListPage {initData} canDelete={checkout.can_delete_orders} />
     {:else if page === PAGES.STATS}
       <StatsPage {initData} />
     {:else if page === PAGES.STOCK}
-      <StockPage {initData} />
+      <StockPage {initData} canChangeStock={checkout.can_change_stock} />
     {:else if page === PAGES.CONSOLE}
       <ConsolePage {initData} />
     {/if}
