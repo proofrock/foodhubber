@@ -102,7 +102,10 @@
 
         for (let i = 0; i < initData.items.length; i++) {
             const item = initData.items[i];
-            if (!!order.allowance[item.item])
+            if (
+                order.allowance.hasOwnProperty(item.item) &&
+                order.allowance[item.item] >= 0
+            )
                 residualAllowance[item.id.toString()] = {
                     limit: order.allowance[item.item],
                     item: item.item,
