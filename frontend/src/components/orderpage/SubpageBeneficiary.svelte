@@ -102,22 +102,32 @@
                     </tr>
                     <tr>
                         <td>+ sett. corrente</td>
-                        <td>{B2S(details.lastOrder.thisWeek)}</td>
+                        <td>
+                            {#if details.lastOrder.thisWeek}
+                                <b class="red-text"
+                                    >{B2S(details.lastOrder.thisWeek)}</b
+                                >
+                            {:else}
+                                {B2S(details.lastOrder.thisWeek)}
+                            {/if}
+                        </td>
                     </tr>
                 {/if}
-                <tr>
-                    <td colspan="2" class="center">
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <a on:click={popup}>Stampa Scheda</a></td
-                    >
-                </tr>
+                {#if details.enabledForWeek && (!details.lastOrder || !details.lastOrder.thisWeek)}
+                    <tr>
+                        <td colspan="2" class="center">
+                            <!-- svelte-ignore a11y-click-events-have-key-events -->
+                            <!-- svelte-ignore a11y-no-static-element-interactions -->
+                            <!-- svelte-ignore a11y-missing-attribute -->
+                            <a on:click={popup}>Stampa Scheda</a></td
+                        >
+                    </tr>
+                {/if}
             </table>
         </div>
         <div class="col hide-on-small-and-down m2 l3 xl4" />
     </div>
-    {#if details.enabledForWeek}
+    {#if details.enabledForWeek && (!details.lastOrder || !details.lastOrder.thisWeek)}
         <Divider />
         <div class="center">
             <h5>Quantità settimanale</h5>
@@ -157,13 +167,14 @@
         class="btn-floating btn-large green"
         href="#!"
         on:click={() => {
-            if (details) {
-                if (details.enabledForWeek) order.subpage = 2;
-                else
-                    ALERT_ERROR(
-                        "Beneficiario non abilitato per questa settimana.",
-                    );
-            } else ALERT_ERROR("Beneficiario non valido.");
+            if (!details) ALERT_ERROR("Beneficiario non valido.");
+            else if (!!details.lastOrder && details.lastOrder.thisWeek)
+                ALERT_ERROR(
+                    "Il beneficiario ha già compiuto una visita questa settimana.",
+                );
+            else if (!details.enabledForWeek)
+                ALERT_ERROR("Beneficiario non abilitato per questa settimana.");
+            else order.subpage = 2;
         }}
     >
         <i class="material-icons">arrow_forward</i>
