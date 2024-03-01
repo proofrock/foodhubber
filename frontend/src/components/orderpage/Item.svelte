@@ -71,7 +71,13 @@
 >
     <div class="card-content sm-cell-smallcell">
         <span class="card-title">
-            <b>{itm.item}</b>
+            <b
+                >{#if itm.subitem === null || itm.subitem === ""}
+                    {itm.item}
+                {:else}
+                    {itm.subitem}
+                {/if}</b
+            >
             <span class="right">
                 {#if qty === 0}
                     --
@@ -84,7 +90,7 @@
             {#if itm.subitem === null || itm.subitem === ""}
                 &nbsp;
             {:else}
-                {itm.subitem}
+                {itm.item}
             {/if}
         </span>
         <span class="right">
