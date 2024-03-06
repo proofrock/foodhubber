@@ -54,7 +54,7 @@
 
     async function about() {
         await ALERT_INFO(
-            `<p><big>FoodHubber v${initData.version}</big></p>
+            `<p><big>FoodHubber ${initData.version}</big></p>
              <hr>
              <p>&copy; 2024- G. Rizzo, col patrocinio di <br/><a href="https://www.emergency.it/" target="_blank">Emergency ONG Onlus</a> 
                 e <a href="https://www.aton.com" target="_blank">Aton Società Benefit S.p.A.</a>.</p>
