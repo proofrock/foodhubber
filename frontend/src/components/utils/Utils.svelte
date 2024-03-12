@@ -99,8 +99,6 @@
     }
 
     // @ts-ignore
-    const url_prefix = "/api";
-
     export const CALL = async function (
         srv,
         method = "GET",
@@ -108,7 +106,7 @@
         map = null,
         timeout = 5000,
     ) {
-        let url = url_prefix + "/" + srv;
+        let url = "/api/" + srv;
         if (!!map) url += mapToUrl(map);
 
         const req = {
@@ -210,9 +208,9 @@
         await alert(text, "success");
     };
 
-    export const ALERT_WARNING = async function (text) {
-        await alert(text, "warning");
-    };
+    // export const ALERT_WARNING = async function (text) {
+    //     await alert(text, "warning");
+    // };
 
     export const ALERT_ERROR = async function (text) {
         await alert(text, "error");
@@ -238,20 +236,20 @@
         return (await Swal.fire(cfg)).isConfirmed;
     };
 
-    export const DIALOG_CHOOSE = async function (text, options) {
-        const cfg = {
-            icon: "question",
-            confirmButtonText: "Ok",
-            input: "radio",
-            inputOptions: options,
-        };
+    // export const DIALOG_CHOOSE = async function (text, options) {
+    //     const cfg = {
+    //         icon: "question",
+    //         confirmButtonText: "Ok",
+    //         input: "radio",
+    //         inputOptions: options,
+    //     };
 
-        if (seemsHTML(text)) cfg["html"] = text;
-        else cfg["text"] = text;
+    //     if (seemsHTML(text)) cfg["html"] = text;
+    //     else cfg["text"] = text;
 
-        // @ts-ignore
-        return (await Swal.fire(cfg)).value;
-    };
+    //     // @ts-ignore
+    //     return (await Swal.fire(cfg)).value;
+    // };
 
     export const DIALOG_PROMPT = async function (text) {
         const cfg = {
@@ -303,14 +301,14 @@
         );
     };
 
-    export const IS_NUMERIC = function (obj) {
-        // from https://github.com/jquery/jquery/blob/bf48c21d225c31f0f9b5441d95f73615ca3dcfdb/src/core.js#L206
-        return !Array.isArray(obj) && obj - parseFloat(obj) + 1 >= 0;
-    };
+    // export const IS_NUMERIC = function (obj) {
+    //     // from https://github.com/jquery/jquery/blob/bf48c21d225c31f0f9b5441d95f73615ca3dcfdb/src/core.js#L206
+    //     return !Array.isArray(obj) && obj - parseFloat(obj) + 1 >= 0;
+    // };
 
-    export const IS_INTEGER = function (obj) {
-        return Number.isInteger(parseFloat(obj));
-    };
+    // export const IS_INTEGER = function (obj) {
+    //     return Number.isInteger(parseFloat(obj));
+    // };
 
     export const B2S = function (b) {
         return b ? "Sì" : "No";
