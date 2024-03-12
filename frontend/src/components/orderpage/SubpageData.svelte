@@ -39,6 +39,7 @@
     $: toSave = {};
     $: errors = [];
     $: warnings = [];
+    $: leftovers = []; // after the order, what articles still are not fully ordered (there's still allowance)
 
     const residuals = {};
 
@@ -88,6 +89,7 @@
 
         const _errors = [];
         const _warnings = [];
+        const _leftovers = [];
 
         let isEmpty = true;
 
@@ -99,8 +101,9 @@
 
             // Check the residual allowance
             const item = initData.itemsMap.get(itemId);
-            if (residuals.hasOwnProperty(item.item))
+            if (residuals.hasOwnProperty(item.item)) {
                 residuals[item.item] -= quantity;
+            }
 
             isEmpty = false;
         }
@@ -112,10 +115,18 @@
                     _errors.push(
                         `L'ordinato per la categoria '${key}' è superiore a quanto previsto.`,
                     );
+                else if (residuals[key] > 0)
+                    _leftovers.push([key, residuals[key]]);
             });
 
-        errors = _errors;
-        warnings = _warnings;
+        if (_leftovers.length > 0)
+            _warnings.push(
+                "Ci sono ancora articoli che possono essere ordinati, altrimenti saranno 'persi'.",
+            );
+
+        if (_errors.length > 0) errors = _errors;
+        if (_warnings.length > 0) warnings = _warnings;
+        if (_leftovers.length > 0) leftovers = _leftovers;
     }
 
     async function save() {
@@ -221,6 +232,32 @@
             {/each}
         </div>
         <div class="col hide-on-small-and-down m1 l2 xl3" />
+    </div>
+{/if}
+
+<Divider />
+
+{#if leftovers.length > 0}
+    <div class="center">
+        <h5>Articoli non ordinati (saranno 'persi')</h5>
+    </div>
+    <div class="row">
+        <div class="col hide-on-small-and-down s1 m2 l3 xl4" />
+        <div class="input-field col s10 m8 l6 xl4">
+            <table>
+                <tr>
+                    <th>Categoria</th>
+                    <th>Qtà residua</th>
+                </tr>
+                {#each leftovers as leftover (leftover[0])}
+                    <tr>
+                        <td>{leftover[0]}</td>
+                        <td>{leftover[1]}</td>
+                    </tr>
+                {/each}
+            </table>
+        </div>
+        <div class="col hide-on-small-and-down s1 m2 l3 xl4" />
     </div>
 {/if}
 
