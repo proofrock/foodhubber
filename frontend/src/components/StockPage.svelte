@@ -23,6 +23,7 @@
     import {
         ALERT_ERROR,
         CALL,
+        DIALOG_CONFIRM,
         DIALOG_PROMPT,
         MAT_ENABLE_SELECT,
         TOAST,
@@ -101,6 +102,20 @@
 
     async function setStock(item, stock) {
         if (!canChangeStock) return;
+
+        if (stock !== null) {
+            let text = "";
+            if (stock.startsWith("+"))
+                text = `<p>La giacenza sarà <u>aumentata</u> di ${stock.substring(1)} unità.</p>`;
+            else if (stock.startsWith("-"))
+                text = `<p>La giacenza sarà <u>diminuita</u> di ${stock.substring(1)} unità.</p>`;
+            else
+                text = `<p>La giacenza sarà <u>impostata</u> a ${stock} unità.</p>`;
+
+            text += "<p>Vuoi confermare?</p>";
+            if (!(await DIALOG_CONFIRM(text))) return;
+        }
+
         const ret = await CALL("setStock", "POST", { item, stock });
         if (ret.isErr)
             await ALERT_ERROR(`<p>Modifica fallita.</p><p>${ret.message}.</p>`);
@@ -117,7 +132,7 @@
         <p>Inserisci una quantità, o una differenza (+10, -20...)<p>
         <p>Vuoto: nessuna gestione (scorta infinita)<p>`);
         if (stock === null || stock.trim() === "") return;
-        setStock(item, stock);
+        await setStock(item, stock);
     }
 </script>
 
