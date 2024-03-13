@@ -39,7 +39,7 @@
     $: toSave = {};
     $: errors = [];
     $: warnings = [];
-    $: leftovers = []; // after the order, what articles still are not fully ordered (there's still allowance)
+    $: leftovers = []; // after the order, which articles still are not fully ordered (there's still allowance)
 
     const residuals = {};
 
@@ -110,14 +110,17 @@
 
         if (isEmpty) _errors.push("L'ordine è vuoto.");
         else
-            Object.keys(residuals).forEach((key) => {
-                if (residuals[key] < 0)
-                    _errors.push(
-                        `L'ordinato per la categoria '${key}' è superiore a quanto previsto.`,
-                    );
-                else if (residuals[key] > 0)
-                    _leftovers.push([key, residuals[key]]);
-            });
+            for (let i = 0; i < initData.item_categories.length; i++) {
+                const key = initData.item_categories[i];
+                if (!!residuals[key]) {
+                    if (residuals[key] < 0)
+                        _errors.push(
+                            `L'ordinato per la categoria '${key}' è superiore a quanto previsto.`,
+                        );
+                    else if (residuals[key] > 0)
+                        _leftovers.push([key, residuals[key]]);
+                }
+            }
 
         if (_leftovers.length > 0)
             _warnings.push(
@@ -221,14 +224,18 @@
             <h5>Errori</h5>
             <div class="divider" />
             {#each errors as row}
-                <p class="red-text darken-2">{row}</p>
+                <div>&nbsp;</div>
+                <div class="border-error">{row}</div>
             {/each}
         </div>
         <div class="input-field col s12 m5 l4 xl3">
             <h5>Avvertimenti</h5>
             <div class="divider" />
             {#each warnings as row}
-                <p>{row}</p>
+                <div>&nbsp;</div>
+                <div class="border-warning">
+                    {row}
+                </div>
             {/each}
         </div>
         <div class="col hide-on-small-and-down m1 l2 xl3" />
@@ -280,3 +287,15 @@
         <i class="material-icons">send</i>
     </a>
 </div>
+
+<style>
+    .border-warning {
+        border-left: 3px solid gold;
+        padding-left: 5px;
+    }
+
+    .border-error {
+        border-left: 3px solid red;
+        padding-left: 5px;
+    }
+</style>

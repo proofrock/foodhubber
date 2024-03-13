@@ -83,6 +83,12 @@
           item.type = curType.id;
         }
 
+        __initData.item_categories = [];
+        __initData.items.forEach((it) => {
+          if (!__initData.item_categories.includes(it.item))
+            __initData.item_categories.push(it.item);
+        });
+
         window.sessionStorage.setItem("init_data", JSON.stringify(__initData));
         initData = __initData;
         break;
