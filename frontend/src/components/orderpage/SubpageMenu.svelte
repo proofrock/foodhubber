@@ -21,6 +21,7 @@
     import Item from "./Item.svelte";
     import { createEventDispatcher, onDestroy, onMount } from "svelte";
     import {
+        DIALOG_CONFIRM,
         GET_SCREEN_SIZE,
         MAT_ENABLE_FAB,
     } from "../../components/utils/Utils.svelte";
@@ -257,8 +258,9 @@
         <a
             class="btn-floating btn-large red"
             href="#!"
-            on:click={() => {
-                dispatch("reset", null);
+            on:click={async () => {
+                const txt = "Sei sicuro di voler annullare il ritiro?";
+                if (await DIALOG_CONFIRM(txt)) dispatch("reset", null);
             }}
         >
             <i class="large material-icons">delete_sweep</i>
