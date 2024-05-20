@@ -23,7 +23,7 @@ This project is released as Free and Open Source Software under the [GPLv3 licen
   - es. sotto windows dovrebbe essere sufficiente fare doppio click sull'eseguibile.
 - collegarsi con un browser a http://localhost:31020
 
-E' attivo un beneficiario con codice `123`.
+E' attivo un beneficiario con Id `123`.
 
 Per test, potrebbe essere utile cambiare la settimana corrente; può essere fatto con il flag da linea di comando `--force-week`:
 

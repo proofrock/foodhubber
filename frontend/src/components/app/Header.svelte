@@ -110,7 +110,7 @@
                             href="#!"
                             on:click={() => {
                                 dispatch("ch_page", PAGES.ORDER);
-                            }}>Ordine</a
+                            }}>Ritiro</a
                         >
                     </li>
                     {#if checkout.can_access_order_list_page}
@@ -119,7 +119,7 @@
                                 href="#!"
                                 on:click={() => {
                                     dispatch("ch_page", PAGES.ORDERS_LIST);
-                                }}>Lista Ordini</a
+                                }}>Lista Ritiri</a
                             >
                         </li>
                     {/if}

@@ -69,7 +69,7 @@
     on:click|stopPropagation={leftclick}
     on:contextmenu|preventDefault={rightclick}
 >
-    <div class="card-content sm-cell-smallcell">
+    <div class="card-content sm-cell-smallcell hoverable">
         <span class="card-title">
             <b
                 >{#if itm.subitem === null || itm.subitem === ""}

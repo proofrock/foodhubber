@@ -156,7 +156,7 @@
                     <th>Valore</th>
                 </tr>
                 <tr>
-                    <th>Ordini</th>
+                    <th>Ritiri</th>
                     <td>{data.orders}</td>
                 </tr>
                 <tr>
@@ -171,7 +171,7 @@
             <table>
                 <tr>
                     <th />
-                    <th>Ordini</th>
+                    <th>Ritiri</th>
                     <th>Articoli</th>
                 </tr>
                 {#each data.byCheckout as ck (ck.checkout)}
@@ -193,7 +193,7 @@
             <table>
                 <tr>
                     <th />
-                    <th>Ordinati</th>
+                    <th>Ritirati</th>
                 </tr>
                 {#each data.items_to_display as itm (itm.id)}
                     <tr>

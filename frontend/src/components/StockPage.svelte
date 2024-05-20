@@ -51,7 +51,7 @@
             if (filter === "2") {
                 dataFiltered = data;
             } else if (filter === "1") {
-                dataFiltered = data.filter((itm) => itm.stock !== "--");
+                dataFiltered = data.filter((itm) => itm.stock !== "∞");
             } else if (filter === "0") {
                 dataFiltered = data.filter(
                     (itm) =>
@@ -77,7 +77,7 @@
             items_to_display.push({
                 id: item.id,
                 name: item.item + (!!item.subitem ? "/" + item.subitem : ""),
-                stock: !!itm ? itm.stock : "--",
+                stock: !!itm ? itm.stock : "∞",
                 class: !itm
                     ? ""
                     : itm.stock <= initData.red_limit

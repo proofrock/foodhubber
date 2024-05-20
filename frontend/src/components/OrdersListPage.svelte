@@ -26,6 +26,8 @@
         DIALOG_CONFIRM,
         DIALOG_PROMPT,
         ENC_HTML,
+        FORMAT_DATE_TIME,
+        FORMAT_TIME,
         MAT_ENABLE_DROPDOWN,
     } from "../components/utils/Utils.svelte";
     import {
@@ -117,6 +119,8 @@
         let info = "";
 
         info += `<p><b>Data/ora:</b> ${ENC_HTML(oi.tstamp)}</p>`;
+        info += `<p><b>Operatore:</b> ${ENC_HTML(oi.cashier)}</p>`;
+        if (!!oi.note) info += `<p><b>Note:</b> ${ENC_HTML(oi.note)}</p>`;
 
         const mapp = new Map();
 
@@ -147,13 +151,13 @@
 
         if (
             id_open < 0 ||
-            !(await DIALOG_CONFIRM("Vuoi davvero cancellare quest'ordine?"))
+            !(await DIALOG_CONFIRM("Vuoi davvero cancellare questo ritiro?"))
         )
             return;
 
         const res = await CALL("delOrder", "DELETE", null, { id: id_open });
         if (res.isErr) await ALERT_ERROR(`<p>${res.message}.</p>`);
-        else await ALERT_SUCCESS(`<p>Ordine ${id_open} cancellato</p>`);
+        else await ALERT_SUCCESS(`<p>Ritiro ${id_open} cancellato</p>`);
         reload();
     }
 
@@ -168,7 +172,7 @@
 {#if data === null}
     <div class="center"><h5>Caricamento...</h5></div>
 {:else if data.length === 0}
-    <div class="center"><h5>Nessun ordine da visualizzare</h5></div>
+    <div class="center"><h5>Nessun ritiro da visualizzare</h5></div>
 {:else}
     <div id="top" />
     {#if page > 1}
@@ -189,7 +193,7 @@
         <div class="input-field col s12 m12 l10 xl8">
             <table>
                 <tr class="row">
-                    <th>#</th>
+                    <th>N°</th>
                     <th>Postazione</th>
                     <th class="hide-on-med-and-down">Operatore</th>
                     <th>Beneficiario</th>
@@ -240,7 +244,7 @@
                                         class="btn red"
                                         href="#!"
                                         on:click={del}
-                                        title="Cancella ordine"
+                                        title="Cancella ritiro"
                                     >
                                         <i class="material-icons"
                                             >delete_forever</i
@@ -272,7 +276,7 @@
             </a>
         </div>
     {:else}
-        <div class="center"><h6><i>Nessun altro ordine</i></h6></div>
+        <div class="center"><h6><i>Nessun altro ritiro</i></h6></div>
     {/if}
 {/if}
 

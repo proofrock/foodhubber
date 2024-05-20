@@ -108,14 +108,14 @@
             isEmpty = false;
         }
 
-        if (isEmpty) _errors.push("L'ordine è vuoto.");
+        if (isEmpty) _errors.push("Il ritiro è vuoto.");
         else
             for (let i = 0; i < initData.item_categories.length; i++) {
                 const key = initData.item_categories[i];
                 if (!!residuals[key]) {
                     if (residuals[key] < 0)
                         _errors.push(
-                            `L'ordinato per la categoria '${key}' è superiore a quanto previsto.`,
+                            `La qt. ritirata per la categoria '${key}' è superiore a quanto previsto.`,
                         );
                     else if (residuals[key] > 0)
                         _leftovers.push([key, residuals[key]]);
@@ -124,7 +124,7 @@
 
         if (_leftovers.length > 0)
             _warnings.push(
-                "Ci sono ancora articoli che possono essere ordinati, altrimenti saranno 'persi'.",
+                "Ci sono ancora articoli che possono essere ritirati, altrimenti saranno 'persi'.",
             );
 
         if (_errors.length > 0) errors = _errors;
@@ -135,7 +135,7 @@
     async function save() {
         if (errors.length > 0) {
             ALERT_ERROR(
-                "Ci sono degli errori. Non è possibile inviare l'ordine.",
+                "Ci sono degli errori. Non è possibile inviare il ritiro.",
             );
             return;
         }
@@ -143,12 +143,12 @@
         if (warnings.length > 0) {
             if (
                 !(await DIALOG_CONFIRM(
-                    "Ci sono dei messaggi di attenzione.<br/>Vuoi continuare lo stesso?",
+                    "Ci sono degli avvisi.<br/>Vuoi continuare lo stesso?",
                 ))
             )
                 return;
         } else {
-            if (!(await DIALOG_CONFIRM("Vuoi registrare quest'ordine?")))
+            if (!(await DIALOG_CONFIRM("Vuoi registrare questo ritiro?")))
                 return;
         }
 
@@ -164,7 +164,7 @@
                     "<p>NOTA: almeno un articolo è andato sottoscorta. Verificare.</p>";
 
             await ALERT_SUCCESS(
-                `<p>Ordine n.${res.payload.id} registrato correttamente.</p>${addendum}`,
+                `<p>Ritiro n° ${res.payload.id} registrato correttamente.</p>${addendum}`,
             );
             dispatch("reset", null);
         }
@@ -229,7 +229,7 @@
             {/each}
         </div>
         <div class="input-field col s12 m5 l4 xl3">
-            <h5>Avvertimenti</h5>
+            <h5>Avvisi</h5>
             <div class="divider" />
             {#each warnings as row}
                 <div>&nbsp;</div>
@@ -246,7 +246,7 @@
 
 {#if leftovers.length > 0}
     <div class="center">
-        <h5>Articoli non ordinati (saranno 'persi')</h5>
+        <h5>Articoli non ritirati (saranno 'persi')</h5>
     </div>
     <div class="row">
         <div class="col hide-on-small-and-down s1 m2 l3 xl4" />

@@ -63,7 +63,7 @@
     <div class="input-field inline col s12 m6 l4 xl2">
         <i class="material-icons prefix">face</i>
         <input id="code" type="text" maxlength="16" bind:value={candidate} />
-        <label for="code" class="active">Codice beneficiario</label>
+        <label for="code" class="active">Id beneficiario</label>
         <button class="btn green right" on:click={submit}
             ><i class="material-icons">arrow_forward</i></button
         >
@@ -89,7 +89,7 @@
                     <td>{B2S(details.enabledForWeek)}</td>
                 </tr>
                 <tr>
-                    <td>Ultimo ordine</td>
+                    <td>N° ultimo ritiro effettuato</td>
                     <td
                         >{#if !!details.lastOrder}{details.lastOrder
                                 .id}{:else}--{/if}</td
@@ -97,11 +97,11 @@
                 </tr>
                 {#if !!details.lastOrder}
                     <tr>
-                        <td>+ in data</td>
+                        <td>in data</td>
                         <td>{FORMAT_DATE_TIME(details.lastOrder.date)}</td>
                     </tr>
                     <tr>
-                        <td>+ sett. corrente</td>
+                        <td>già venuto questa settimana</td>
                         <td>
                             {#if details.lastOrder.thisWeek}
                                 <b class="red-text"
@@ -139,7 +139,9 @@
                     <tr>
                         <th>Categoria</th>
                         <th class="hide-on-small-and-down">Qtà prevista</th>
-                        <th class="hide-on-small-and-down">Ordinato sett.</th>
+                        <th class="hide-on-small-and-down"
+                            >Qtà ritirata sett.</th
+                        >
                         <th>Qtà residua</th>
                     </tr>
                     {#each details.allowance as row, i}
