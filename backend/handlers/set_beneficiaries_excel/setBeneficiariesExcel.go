@@ -33,7 +33,8 @@ type response struct {
 }
 
 const headerForKey = "id_paziente"
-const headerForProfile = "codice settimana"
+const headerForProfile1 = "codice settimana"
+const headerForProfile2 = "codice_settimana"
 
 func SetBeneficiariesExcel(c *fiber.Ctx) error {
 	file, err := c.FormFile("file")
@@ -58,7 +59,10 @@ func SetBeneficiariesExcel(c *fiber.Ctx) error {
 	}
 
 	keysColumn := slices.Index[[]string, string](cells[0], headerForKey)
-	profilesColumn := slices.Index[[]string, string](cells[0], headerForProfile)
+	profilesColumn := slices.Index[[]string, string](cells[0], headerForProfile1)
+	if profilesColumn < 0 {
+		profilesColumn = slices.Index[[]string, string](cells[0], headerForProfile2)
+	}
 	if keysColumn < 0 || profilesColumn < 0 {
 		return utils.SendError(c, fiber.StatusBadRequest, "FHE200", "", nil)
 	}
