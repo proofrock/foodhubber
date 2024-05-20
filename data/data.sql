@@ -55,9 +55,9 @@ INSERT INTO checkouts
 (id, pos, can_access_order_list_page, can_delete_orders, can_access_stats_page,
  can_access_stock_page, can_change_stock, can_access_console_page, password_hash)
 VALUES
-('CASSA 1', 10, true, false, false, false, false, false, null),
-('CASSA 2', 20, true, true,  false, false, true,  false, null),
-('MANAGER', 30, true, true,  true,  true,  true,  true, 'b133a0c0e9bee3be20163d2ad31d6248db292aa6dcb1ee087a2aa50e0fc75ae2');
+('CASSA 1', 10, true, false, false, true, false, false, null),
+('CASSA 2', 20, true, false, false, true, false, false, null),
+('MANAGER', 30, true, true,  true,  true, true,  true, 'e52f60ef556767578566ec462fa1b19b78bcd8049ff9629b5f89174d3a497960');
 
 INSERT INTO rules
 (profile, item, quantity_w1, quantity_w2, quantity_w3, quantity_w4)
