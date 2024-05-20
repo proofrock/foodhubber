@@ -1,7 +1,8 @@
 INSERT INTO configs (key, value) VALUES
 ('order_list_page_size', '25'),
 ('polling_cycle', '1000'),
-('warn_limit', '20');
+('yellow_limit', '150'),
+('red_limit', '25');
 
 INSERT INTO items
 (id, pos, color, item, subitem)

@@ -55,7 +55,7 @@
             } else if (filter === "0") {
                 dataFiltered = data.filter(
                     (itm) =>
-                        itm.stock !== "--" && itm.stock < initData.warn_limit,
+                        itm.stock !== "∞" && itm.stock <= initData.yellow_limit,
                 );
             }
         }
@@ -80,9 +80,9 @@
                 stock: !!itm ? itm.stock : "--",
                 class: !itm
                     ? ""
-                    : itm.stock <= 0
+                    : itm.stock <= initData.red_limit
                       ? "bd-red"
-                      : itm.stock < initData.warn_limit
+                      : itm.stock <= initData.yellow_limit
                         ? "bd-yellow"
                         : "",
             });

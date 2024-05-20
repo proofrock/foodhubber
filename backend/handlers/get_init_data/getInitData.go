@@ -47,7 +47,8 @@ type checkout struct {
 type response struct {
 	Version      string     `json:"version"`
 	PollingCycle int        `json:"polling_cycle"`
-	WarnLimit    int        `json:"warn_limit"`
+	YellowLimit  int        `json:"yellow_limit"`
+	RedLimit     int        `json:"red_limit"`
 	Items        []item     `json:"items"`
 	Checkouts    []checkout `json:"checkouts"`
 }
@@ -71,12 +72,20 @@ func GetInitData(c *fiber.Ctx) error {
 		return utils.SendError(c, fiber.StatusInternalServerError, "FHE005", "polling_cycle", &err)
 	}
 
-	row = params.Db.QueryRow("SELECT value FROM configs WHERE key = $1", "warn_limit")
+	row = params.Db.QueryRow("SELECT value FROM configs WHERE key = $1", "yellow_limit")
 	if err = row.Scan(&val); err != nil {
 		return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "configs", &err)
 	}
-	if ret.WarnLimit, err = strconv.Atoi(val); err != nil {
-		return utils.SendError(c, fiber.StatusInternalServerError, "FHE005", "warn_limit", &err)
+	if ret.YellowLimit, err = strconv.Atoi(val); err != nil {
+		return utils.SendError(c, fiber.StatusInternalServerError, "FHE005", "yellow_limit", &err)
+	}
+
+	row = params.Db.QueryRow("SELECT value FROM configs WHERE key = $1", "red_limit")
+	if err = row.Scan(&val); err != nil {
+		return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "configs", &err)
+	}
+	if ret.RedLimit, err = strconv.Atoi(val); err != nil {
+		return utils.SendError(c, fiber.StatusInternalServerError, "FHE005", "red_limit", &err)
 	}
 
 	sql := `
