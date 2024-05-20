@@ -71,8 +71,13 @@ func GetOrders(c *fiber.Ctx) error {
 			  FROM orders
 			 WHERE active = 1`
 	if filter != "" {
-		query += " AND (id = $1 OR beneficiary_id = $2 OR checkout_id LIKE '%' + $3 + '%' OR operator LIKE '%' + $4 + '%')"
-		row = params.Db.QueryRow(query, filter, filter, filter, filter)
+		query += ` AND (id = $1 
+			            OR beneficiary_id = $2 
+			            OR checkout_id LIKE '%' || $3 || '%' 
+						OR operator LIKE '%' || $4 || '%'
+						OR strftime('%d/%m/%Y %H:%M:%S', datetime) LIKE '%' || $5 || '%'
+					   )`
+		row = params.Db.QueryRow(query, filter, filter, filter, filter, filter)
 	} else {
 		row = params.Db.QueryRow(query)
 	}
@@ -84,18 +89,22 @@ func GetOrders(c *fiber.Ctx) error {
 
 	if filter != "" {
 		query := `
-			SELECT id, checkout_id, operator, beneficiary_id, note, strftime('%Y%m%dT%H%M%S', datetime) AS datetime
+			SELECT id, checkout_id, operator, beneficiary_id, note, strftime('%d/%m/%Y %H:%M:%S', datetime) AS datetime
 		      FROM orders
 	         WHERE active = 1
-			   AND (id = $1 OR beneficiary_id = $2
-			        OR checkout_id LIKE '%' + $3 + '%' OR operator LIKE '%' + $4 + '%')
+			   AND (id = $1 
+				    OR beneficiary_id = $2
+			        OR checkout_id LIKE '%' || $3 || '%'
+					OR operator LIKE '%' || $4 || '%'
+					OR strftime('%d/%m/%Y %H:%M:%S', datetime) LIKE '%' || $5 || '%'
+				   )
 	         ORDER BY id DESC
              LIMIT (SELECT value FROM configs WHERE key = 'order_list_page_size')
-            OFFSET ($5 - 1) * (SELECT value FROM configs WHERE key = 'order_list_page_size')`
-		rows, err = params.Db.Query(query, filter, filter, filter, filter, page)
+            OFFSET ($6 - 1) * (SELECT value FROM configs WHERE key = 'order_list_page_size')`
+		rows, err = params.Db.Query(query, filter, filter, filter, filter, filter, page)
 	} else {
 		query := `
-			SELECT id, checkout_id, operator, beneficiary_id, note, strftime('%Y%m%dT%H%M%S', datetime) AS datetime
+			SELECT id, checkout_id, operator, beneficiary_id, note, strftime('%d/%m/%Y %H:%M:%S', datetime) AS datetime
 		      FROM orders
 	         WHERE active = 1
 	         ORDER BY id DESC

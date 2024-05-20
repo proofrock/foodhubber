@@ -26,8 +26,6 @@
         DIALOG_CONFIRM,
         DIALOG_PROMPT,
         ENC_HTML,
-        FORMAT_DATE_TIME,
-        FORMAT_TIME,
         MAT_ENABLE_DROPDOWN,
     } from "../components/utils/Utils.svelte";
     import {
@@ -118,12 +116,7 @@
         const oi = data.find((ord) => id_open === ord.id);
         let info = "";
 
-        info +=
-            "<p><b>Data/ora:</b> " +
-            ENC_HTML(FORMAT_DATE_TIME(oi.tstamp)) +
-            "</p>";
-        info += "<p><b>Operatore:</b> " + ENC_HTML(oi.cashier) + "</p>";
-        if (!!oi.note) info += "<p><b>Note:</b> " + ENC_HTML(oi.note) + "</p>";
+        info += `<p><b>Data/ora:</b> ${ENC_HTML(oi.tstamp)}</p>`;
 
         const mapp = new Map();
 
@@ -219,11 +212,9 @@
                                 }}>{order.beneficiary}</a
                             ></td
                         >
-                        <td class="hide-on-small-only"
-                            >{FORMAT_DATE_TIME(order.tstamp)}</td
-                        >
+                        <td class="hide-on-small-only">{order.tstamp}</td>
                         <td class="hide-on-med-and-up"
-                            >{FORMAT_TIME(order.tstamp)}</td
+                            >{order.tstamp.split(" ")[1]}</td
                         >
                         <td
                             on:click={() => {
