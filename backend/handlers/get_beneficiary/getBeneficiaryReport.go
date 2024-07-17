@@ -117,20 +117,9 @@ func GetBeneficiaryReport(c *fiber.Ctx) error {
 	if ret.EnabledForWeek {
 		allowances := make([]allowance, 0)
 		query := fmt.Sprintf(`
-			 WITH ORDERED AS (
-			   SELECT il1.item, SUM(orw.quantity) as quantity
-				 FROM vu_items_lvl_1 il1
-				 JOIN items i ON il1.item = i.item 
-				 JOIN order_rows orw ON i.id = orw.item_id
-				 JOIN orders o ON orw.order_id = o.id 
-				WHERE o.beneficiary_id = $1 
-				  AND o.active = 1
-				  AND o.datetime >= DATE(DATETIME('now', 'localtime'), 'weekday 1', '-7 days') || ' 00:00:00'
-				GROUP BY il1.item)
-			 SELECT r.item, r.quantity_w%d - COALESCE(o.quantity, 0) AS residual
+			 SELECT r.item, r.quantity_w%d AS allowance
 			   FROM rules r
 			   JOIN vu_items_lvl_1 il1 ON r.item = il1.item
-			   LEFT JOIN ORDERED AS o ON r.item = o.item
 			  WHERE r.profile = $2
 			  ORDER BY il1.pos ASC`, weekNo)
 		rows, err := params.Db.Query(query, id, ret.Profile)
@@ -140,7 +129,7 @@ func GetBeneficiaryReport(c *fiber.Ctx) error {
 		defer rows.Close()
 		for rows.Next() {
 			var allowance allowance
-			err = rows.Scan(&allowance.Item, &allowance.Residual)
+			err = rows.Scan(&allowance.Item, &allowance.Allowance)
 			if err != nil {
 				return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "rules", &err)
 			}
@@ -154,12 +143,12 @@ func GetBeneficiaryReport(c *fiber.Ctx) error {
 		for i := 0; i < len(ret.Allowance); i++ {
 			if i*2+1 < len(allowances) {
 				ret.Allowance[i] = allowanceForReport{
-					Item1: allowances[i*2].Item, Residual1: fmt.Sprint(allowances[i*2].Residual),
-					Item2: allowances[i*2+1].Item, Residual2: fmt.Sprint(allowances[i*2+1].Residual),
+					Item1: allowances[i*2].Item, Residual1: fmt.Sprint(allowances[i*2].Allowance),
+					Item2: allowances[i*2+1].Item, Residual2: fmt.Sprint(allowances[i*2+1].Allowance),
 				}
 			} else {
 				ret.Allowance[i] = allowanceForReport{
-					Item1: allowances[i*2].Item, Residual1: fmt.Sprint(allowances[i*2].Residual),
+					Item1: allowances[i*2].Item, Residual1: fmt.Sprint(allowances[i*2].Allowance),
 				}
 			}
 		}

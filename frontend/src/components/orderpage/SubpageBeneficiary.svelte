@@ -44,7 +44,7 @@
         order.beneficiary = candidate;
         details = res.payload;
         details.allowance.forEach((row) => {
-            order.allowance[row.item] = row.residual;
+            order.allowance[row.item] = row.allowance;
         });
     }
 
@@ -127,39 +127,6 @@
         </div>
         <div class="col hide-on-small-and-down m2 l3 xl4" />
     </div>
-    {#if details.enabledForWeek && (!details.lastOrder || !details.lastOrder.thisWeek)}
-        <Divider />
-        <div class="center">
-            <h5>Quantità settimanale</h5>
-        </div>
-        <div class="row">
-            <div class="col hide-on-small-and-down m2 l3 xl4" />
-            <div class="input-field col s12 m8 l6 xl4">
-                <table>
-                    <tr>
-                        <th>Categoria</th>
-                        <th class="hide-on-small-and-down">Qtà prevista</th>
-                        <th class="hide-on-small-and-down"
-                            >Qtà ritirata sett.</th
-                        >
-                        <th>Qtà residua</th>
-                    </tr>
-                    {#each details.allowance as row, i}
-                        <tr>
-                            <td>{row.item}</td>
-                            <td class="hide-on-small-and-down"
-                                >{row.allowance}</td
-                            >
-                            <td class="hide-on-small-and-down">{row.ordered}</td
-                            >
-                            <td>{row.residual}</td>
-                        </tr>
-                    {/each}
-                </table>
-            </div>
-            <div class="col hide-on-small-and-down m2 l3 xl4" />
-        </div>
-    {/if}
 {/if}
 
 <SpaceForFabs />

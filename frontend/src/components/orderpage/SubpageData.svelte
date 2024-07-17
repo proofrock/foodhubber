@@ -70,7 +70,7 @@
         }
 
         res.payload.allowance.forEach((row) => {
-            residuals[row.item] = row.residual;
+            residuals[row.item] = row.allowance;
         });
     });
 
