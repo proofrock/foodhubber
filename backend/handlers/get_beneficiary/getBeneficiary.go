@@ -62,7 +62,7 @@ func GetBeneficiary(c *fiber.Ctx) error {
 
 	query := `
 		SELECT id, strftime('%Y%m%dT%H%M%S', datetime) AS datetime,
-		       datetime >= DATE(DATETIME('now', 'localtime'), 'weekday 1', '-7 days') || ' 00:00:00' AS inThisWeek
+		       UNIXEPOCH(datetime) >= UNIXEPOCH(DATE(DATETIME('now', 'localtime'), 'weekday 0', '-7 days') || ' 00:00:00') AS inThisWeek
 		  FROM orders 
 		 WHERE beneficiary_id = $1 
 		   AND active = 1
