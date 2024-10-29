@@ -14,6 +14,10 @@ This project is released as Free and Open Source Software under the [GPLv3 licen
 
 **NOTE**: The first versions will be italian only.
 
+## Work in progress!
+
+Questo software è stato concepito, realizzato e messo in esercizio solo di recente; purtroppo non è ancora pubblica la documentazione - ma contiamo di renderla disponibile presto, cominciando con un tutorial per provarlo nel modo più semplice possibile. Stay tuned, e grazie per l'interessamento! 😉
+
 ## Installazione (ita)
 
 - [Scaricare](https://github.com/proofrock/foodhubber/releases) il pacchetto per la propria architettura (es. `foodhubber-v0.6.2-win-amd64.zip`);
