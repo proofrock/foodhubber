@@ -22,8 +22,12 @@ run-devel:
 	cd backend && go run main.go --force-week 1 --db ../env/foodhubber.db
 
 update:
-	cd frontend && npm update
+	npm install --save-dev husky
+	cd frontend && rm -f package-lock.json && npm install
 	cd backend && go get -u && go mod tidy
+	rm package*
+	rm -rf node_modules
+	make clean
 
 clean:
 	rm -rf frontend/node_modules
