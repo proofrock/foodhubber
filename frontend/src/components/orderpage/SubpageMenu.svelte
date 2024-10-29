@@ -101,22 +101,7 @@
         MAT_ENABLE_FAB();
         window.addEventListener("resize", resized);
 
-        for (let i = 0; i < initData.items.length; i++) {
-            const item = initData.items[i];
-            if (
-                order.allowance.hasOwnProperty(item.item) &&
-                order.allowance[item.item] >= 0
-            )
-                residualAllowance[item.id.toString()] = {
-                    limit: order.allowance[item.item],
-                    item: item.item,
-                };
-            else
-                residualAllowance[item.id.toString()] = {
-                    limit: -1,
-                    item: "",
-                };
-        }
+        recalcResidualAllowance();
 
         resized();
     });
@@ -125,7 +110,41 @@
         window.removeEventListener("resize", resized);
     });
 
-    function recalcResidualAllowance(id, increment) {
+    function recalcResidualAllowance() {
+        for (let i = 0; i < initData.items.length; i++) {
+            const detailedItem = initData.items[i];
+            if (
+                order.allowance.hasOwnProperty(detailedItem.item) &&
+                order.allowance[detailedItem.item] >= 0
+            ) {
+                // Allowance for the item is: initial allowance (order.allowance[detailedItem.item])
+                //  minus the sum of quantities for the other items with the same detailedItem.item
+                let limit = order.allowance[detailedItem.item];
+                for (const [itemId, qty] of Object.entries(order.items)) {
+                    const itemIdNum = parseInt(itemId);
+                    if (
+                        itemId !== detailedItem.id.toString() &&
+                        initData.itemsMap.get(itemIdNum).item ===
+                            detailedItem.item
+                    )
+                        limit -= qty;
+                }
+
+                residualAllowance[detailedItem.id.toString()] = {
+                    limit: limit,
+                    item: detailedItem.item,
+                };
+            } else {
+                // Allowance is infinite
+                residualAllowance[detailedItem.id.toString()] = {
+                    limit: -1,
+                    item: "",
+                };
+            }
+        }
+    }
+
+    function recalcSingleResidualAllowance(id, increment) {
         for (const [_id, _obj] of Object.entries(residualAllowance))
             if (
                 _obj.item === initData.itemsMap.get(id).item &&
@@ -140,7 +159,7 @@
         order.items[id.toString()]++;
         selItem = id;
 
-        residualAllowance = recalcResidualAllowance(id, -1);
+        residualAllowance = recalcSingleResidualAllowance(id, -1);
     }
 
     function decrease(data) {
@@ -148,7 +167,7 @@
         order.items[id.toString()]--;
         selItem = id;
 
-        residualAllowance = recalcResidualAllowance(id, +1);
+        residualAllowance = recalcSingleResidualAllowance(id, +1);
     }
 
     function key(evt) {
