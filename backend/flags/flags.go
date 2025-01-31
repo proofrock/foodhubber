@@ -20,8 +20,9 @@ package flags
 
 import (
 	"flag"
-	"foodhubber/params"
-	"foodhubber/utils"
+
+	"github.com/proofrock/foodhubber/params"
+	"github.com/proofrock/foodhubber/utils"
 )
 
 func Parse() {

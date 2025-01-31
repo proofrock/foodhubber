@@ -21,9 +21,10 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"foodhubber/params"
 	"os"
 	"time"
+
+	"github.com/proofrock/foodhubber/params"
 
 	"github.com/gofiber/fiber/v2"
 )

@@ -20,9 +20,10 @@ package db_ops
 
 import (
 	"fmt"
-	"foodhubber/params"
 	"os"
 	"time"
+
+	"github.com/proofrock/foodhubber/params"
 )
 
 const vacuum_period = 5 // min

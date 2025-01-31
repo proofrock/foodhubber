@@ -19,8 +19,8 @@
 package del_session
 
 import (
-	"foodhubber/params"
-	"foodhubber/utils"
+	"github.com/proofrock/foodhubber/params"
+	"github.com/proofrock/foodhubber/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

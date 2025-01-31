@@ -21,10 +21,11 @@ package get_beneficiary
 import (
 	"database/sql"
 	"fmt"
-	"foodhubber/params"
-	"foodhubber/utils"
 	"html/template"
 	"time"
+
+	"github.com/proofrock/foodhubber/params"
+	"github.com/proofrock/foodhubber/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

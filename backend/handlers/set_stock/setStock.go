@@ -21,10 +21,11 @@ package set_stock
 import (
 	"context"
 	"database/sql"
-	"foodhubber/db_ops"
-	"foodhubber/params"
-	"foodhubber/utils"
 	"strconv"
+
+	"github.com/proofrock/foodhubber/db_ops"
+	"github.com/proofrock/foodhubber/params"
+	"github.com/proofrock/foodhubber/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

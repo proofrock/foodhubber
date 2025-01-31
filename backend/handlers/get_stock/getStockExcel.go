@@ -20,9 +20,10 @@ package get_stock
 
 import (
 	"fmt"
-	"foodhubber/params"
-	"foodhubber/utils"
 	"time"
+
+	"github.com/proofrock/foodhubber/params"
+	"github.com/proofrock/foodhubber/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/xuri/excelize/v2"

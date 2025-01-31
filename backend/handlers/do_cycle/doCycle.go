@@ -19,9 +19,10 @@
 package do_cycle
 
 import (
-	"foodhubber/params"
-	"foodhubber/utils"
 	"time"
+
+	"github.com/proofrock/foodhubber/params"
+	"github.com/proofrock/foodhubber/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

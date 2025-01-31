@@ -21,10 +21,11 @@ package put_order
 import (
 	"context"
 	"fmt"
-	"foodhubber/db_ops"
-	"foodhubber/params"
-	"foodhubber/utils"
 	"time"
+
+	"github.com/proofrock/foodhubber/db_ops"
+	"github.com/proofrock/foodhubber/params"
+	"github.com/proofrock/foodhubber/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

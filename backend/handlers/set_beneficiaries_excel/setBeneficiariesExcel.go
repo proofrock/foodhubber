@@ -20,10 +20,11 @@ package set_beneficiaries_excel
 
 import (
 	"context"
-	"foodhubber/db_ops"
-	"foodhubber/params"
-	"foodhubber/utils"
 	"slices"
+
+	"github.com/proofrock/foodhubber/db_ops"
+	"github.com/proofrock/foodhubber/params"
+	"github.com/proofrock/foodhubber/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/xuri/excelize/v2"

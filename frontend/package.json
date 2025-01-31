@@ -11,6 +11,7 @@
   "devDependencies": {
     "@materializecss/materialize": "^1",
     "@sveltejs/vite-plugin-svelte": "^3",
+    "husky": "^9.1.7",
     "jssha": "^3",
     "svelte": "^4",
     "sweetalert2": "^11",

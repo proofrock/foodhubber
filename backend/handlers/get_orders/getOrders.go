@@ -20,9 +20,10 @@ package get_orders
 
 import (
 	"database/sql"
-	"foodhubber/params"
-	"foodhubber/utils"
 	"strconv"
+
+	"github.com/proofrock/foodhubber/params"
+	"github.com/proofrock/foodhubber/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
