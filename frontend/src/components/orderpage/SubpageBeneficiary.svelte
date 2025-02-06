@@ -46,6 +46,10 @@
         details.allowance.forEach((row) => {
             order.allowance[row.item] = row.allowance;
         });
+        details.canProceed =
+            details.weekIsOk &&
+            !details.tooManyOrdersInMonth &&
+            !details.tooManyOrdersInWeek;
     }
 
     function popup() {
@@ -73,61 +77,63 @@
 
 {#if details}
     {#if details.weekIsOk}
-    <Divider />
-    <div class="center">
-        <h5>Dati del beneficiario</h5>
-    </div>
-    <div class="row">
-        <div class="col hide-on-small-and-down m2 l3 xl4" />
-        <div class="input-field col s12 m8 l6 xl4">
-            <table>
-                <tr>
-                    <td>Profilo</td>
-                    <td>{details.profile}</td>
-                </tr>
-                <tr>
-                    <td>Abilitato per questa settimana</td>
-                    <td>{B2S(details.enabledForWeek)}</td>
-                </tr>
-                <tr>
-                    <td>N° ultimo ritiro effettuato</td>
-                    <td
-                        >{#if !!details.lastOrder}{details.lastOrder
-                                .id}{:else}--{/if}</td
-                    >
-                </tr>
-                {#if !!details.lastOrder}
+        <Divider />
+        <div class="center">
+            <h5>Dati del beneficiario</h5>
+        </div>
+        <div class="row">
+            <div class="col hide-on-small-and-down m2 l3 xl4" />
+            <div class="input-field col s12 m8 l6 xl4">
+                <table>
                     <tr>
-                        <td>in data</td>
-                        <td>{FORMAT_DATE_TIME(details.lastOrder.date)}</td>
+                        <td>Profilo</td>
+                        <td>{details.profile}</td>
                     </tr>
                     <tr>
-                        <td>già venuto questa settimana</td>
+                        <td>Ultimo ritiro</td>
+                        <td
+                            >{#if !!details.lastOrder}N°{details.lastOrder.id} del
+                                {FORMAT_DATE_TIME(
+                                    details.lastOrder.date,
+                                )}{:else}--{/if}</td
+                        >
+                    </tr>
+                    <tr>
+                        <td>Già ritirato questa settimana</td>
                         <td>
-                            {#if details.lastOrder.thisWeek}
+                            {#if details.tooManyOrdersInWeek}
                                 <b class="red-text"
-                                    >{B2S(details.lastOrder.thisWeek)}</b
+                                    >{B2S(details.tooManyOrdersInWeek)}</b
                                 >
                             {:else}
-                                {B2S(details.lastOrder.thisWeek)}
+                                {B2S(details.tooManyOrdersInWeek)}
                             {/if}
                         </td>
                     </tr>
-                {/if}
-                {#if details.enabledForWeek && (!details.lastOrder || !details.lastOrder.thisWeek)}
                     <tr>
-                        <td colspan="2" class="center">
-                            <!-- svelte-ignore a11y-click-events-have-key-events -->
-                            <!-- svelte-ignore a11y-no-static-element-interactions -->
-                            <!-- svelte-ignore a11y-missing-attribute -->
-                            <a on:click={popup}>Stampa Scheda</a></td
-                        >
+                        <td>Ritiri in questo mese</td>
+                        <td>
+                            {#if details.tooManyOrdersInMonth}
+                                <b class="red-text">{details.ordersInMonth}</b>
+                            {:else}
+                                {details.ordersInMonth}
+                            {/if}
+                        </td>
                     </tr>
-                {/if}
-            </table>
+                    {#if details.canProceed}
+                        <tr>
+                            <td colspan="2" class="center">
+                                <!-- svelte-ignore a11y-click-events-have-key-events -->
+                                <!-- svelte-ignore a11y-no-static-element-interactions -->
+                                <!-- svelte-ignore a11y-missing-attribute -->
+                                <a on:click={popup}>Stampa Scheda</a></td
+                            >
+                        </tr>
+                    {/if}
+                </table>
+            </div>
+            <div class="col hide-on-small-and-down m2 l3 xl4" />
         </div>
-        <div class="col hide-on-small-and-down m2 l3 xl4" />
-    </div>
     {:else}
         <center
             ><h3>Non è possibile effettuare ritiri questa settimana</h3></center
@@ -143,12 +149,8 @@
         href="#!"
         on:click={() => {
             if (!details) ALERT_ERROR("Beneficiario non valido.");
-            else if (!!details.lastOrder && details.lastOrder.thisWeek)
-                ALERT_ERROR(
-                    "Il beneficiario ha già compiuto una visita questa settimana.",
-                );
-            else if (!details.enabledForWeek)
-                ALERT_ERROR("Beneficiario non abilitato per questa settimana.");
+            else if (!details.canProceed)
+                ALERT_ERROR("Non è possibile proseguire.");
             else order.subpage = 2;
         }}
     >

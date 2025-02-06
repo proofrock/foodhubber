@@ -39,22 +39,27 @@ CREATE TABLE IF NOT EXISTS checkouts (
 CREATE TABLE IF NOT EXISTS rules (
     profile TEXT NOT NULL,
     item TEXT NOT NULL,
-    quantity_w1 INTEGER NULL,
-    quantity_w2 INTEGER NULL,
-    quantity_w3 INTEGER NULL,
-    quantity_w4 INTEGER NULL,
+    quantity_o1 INTEGER NULL,
+    quantity_o2 INTEGER NULL,
+    quantity_o3 INTEGER NULL,
+    quantity_o4 INTEGER NULL,
     PRIMARY KEY (profile, item)
     --FOREIGN KEY(item) REFERENCES items(item)
 );
 
-CREATE VIEW vu_enabled_weeks AS
-SELECT r.profile,
-       EXISTS(SELECT 1 FROM rules r2 WHERE r.profile = r2.profile AND r2.quantity_w1 > 0) AS enabled_w1,
-       EXISTS(SELECT 1 FROM rules r2 WHERE r.profile = r2.profile AND r2.quantity_w2 > 0) AS enabled_w2,
-       EXISTS(SELECT 1 FROM rules r2 WHERE r.profile = r2.profile AND r2.quantity_w3 > 0) AS enabled_w3,
-       EXISTS(SELECT 1 FROM rules r2 WHERE r.profile = r2.profile AND r2.quantity_w4 > 0) AS enabled_w4
-  FROM rules r
- GROUP BY r.profile;
+CREATE VIEW vu_monthly_orders_by_profile AS
+  WITH SUMS AS (
+  SELECT profile, SUM(quantity_o2) as o2,
+         SUM(quantity_o3) as o3, SUM(quantity_o4) as o4
+    FROM rules 
+   GROUP BY profile
+  )
+  SELECT profile,
+         CASE WHEN o2 = 0 THEN 1
+              WHEN o3 = 0 THEN 2
+              WHEN o4 = 0 THEN 3
+              ELSE             4 END AS num
+    FROM SUMS;
 
 CREATE TABLE IF NOT EXISTS beneficiaries (
     id TEXT NOT NULL,

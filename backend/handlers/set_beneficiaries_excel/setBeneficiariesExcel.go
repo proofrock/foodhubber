@@ -33,6 +33,7 @@ import (
 type response struct {
 }
 
+// TODO not hard coded
 const headerForKey = "id_paziente"
 const headerForProfile1 = "codice settimana"
 const headerForProfile2 = "codice_settimana"

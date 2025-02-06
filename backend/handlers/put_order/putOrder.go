@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/proofrock/foodhubber/db_ops"
+	"github.com/proofrock/foodhubber/handlers/get_beneficiary"
 	"github.com/proofrock/foodhubber/params"
 	"github.com/proofrock/foodhubber/utils"
 
@@ -65,8 +66,24 @@ func PutOrder(c *fiber.Ctx) error {
 	defer func() { go db_ops.Backup() }()
 	params.RWLock.Lock()
 	defer params.RWLock.Unlock()
+
+	// Re-check all the prerequisites, as someone might circumvent them by modifying the WebUI
+	// Paranoid, it's me
 	if !utils.IsWeekValid(time.Now()) {
 		return utils.SendError(c, fiber.StatusBadRequest, "FHE106", "", nil)
+	}
+
+	details, err := get_beneficiary.LoadBeneficiarySituation(req.Beneficiary, false, c)
+	if err != nil {
+		return err
+	}
+
+	if details.TooManyOrdersInWeek {
+		return utils.SendError(c, fiber.StatusBadRequest, "FHE104", "", &err)
+	}
+
+	if details.TooManyOrdersInMonth {
+		return utils.SendError(c, fiber.StatusBadRequest, "FHE105", "", &err)
 	}
 
 	tx, err := params.Db.BeginTx(context.Background(), nil)
@@ -74,6 +91,8 @@ func PutOrder(c *fiber.Ctx) error {
 		return utils.SendError(c, fiber.StatusInternalServerError, "FHE007", "", &err)
 	}
 	defer tx.Rollback()
+
+	// All is good, save
 
 	var res response
 
@@ -105,7 +124,6 @@ func PutOrder(c *fiber.Ctx) error {
 		return utils.SendError(c, fiber.StatusInternalServerError, "FHE002", "stock", &err)
 	}
 
-	weekNo := utils.WeekOfMonth(time.Now())
 	query = fmt.Sprintf(`
 			WITH ORDERED AS (
 			  SELECT il1.item, SUM(orw.quantity) as quantity
@@ -118,13 +136,13 @@ func PutOrder(c *fiber.Ctx) error {
 			     AND o.datetime >= DATE(DATETIME('now', 'localtime'), 'weekday 1', '-7 days') || ' 00:00:00'
 			   GROUP BY il1.item)
 			, RESIDUAL AS (
-			  SELECT r.item, r.quantity_w%d - COALESCE(o.quantity, 0) AS residual
+			  SELECT r.item, r.quantity_o%d - COALESCE(o.quantity, 0) AS residual
 			    FROM rules r
 			    JOIN beneficiaries b ON r.profile = b.profile
 			    LEFT JOIN ORDERED o ON r.item = o.item
-			   WHERE b.id = $2)
-			SELECT EXISTS (SELECT 1 FROM RESIDUAL WHERE residual < 0) AS err`, weekNo)
-	row = tx.QueryRow(query, req.Beneficiary, req.Beneficiary)
+			   WHERE b.id = $1)
+			SELECT EXISTS (SELECT 1 FROM RESIDUAL WHERE residual < 0) AS err`, details.OrdersInMonth+1)
+	row = tx.QueryRow(query, req.Beneficiary)
 	var isErr int
 	if err := row.Scan(&isErr); err != nil {
 		return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "ops.RULES", &err)

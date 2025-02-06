@@ -29,94 +29,125 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-type order struct {
-	ID       int    `json:"id"`
-	Date     string `json:"date"`
-	ThisWeek bool   `json:"thisWeek"`
+type Order struct {
+	ID   int    `json:"id"`
+	Date string `json:"date"`
 }
 
-type allowance struct {
+type Allowance struct {
 	Item      string `json:"item"`
 	Allowance int    `json:"allowance"`
 }
 
+type BeneficiarySituation struct {
+	Profile              string      `json:"profile"`
+	LastOrder            *Order      `json:"lastOrder"`
+	OrdersInMonth        int         `json:"ordersInMonth"`        // orders since the first monday of this month
+	TooManyOrdersInMonth bool        `json:"tooManyOrdersInMonth"` // are they more than allowed for profile?
+	TooManyOrdersInWeek  bool        `json:"tooManyOrdersInWeek"`
 	WeekIsOk             bool        `json:"weekIsOk"`
+	Allowance            []Allowance `json:"allowance"`
 }
 
 func GetBeneficiary(c *fiber.Ctx) error {
 	id := c.Query("id", "")
 
-	weekNo := utils.WeekOfMonth(time.Now())
-
-	ret := response{
-		Allowance: make([]allowance, 0),
-	}
-
 	params.RWLock.RLock()
 	defer params.RWLock.RUnlock()
 
+	ret, err := LoadBeneficiarySituation(id, true, c)
+	if err != nil {
+		return err
+	}
+
+	c.JSON(ret)
+	return c.SendStatus(fiber.StatusOK)
+}
+
+// Must lock before it!
+func LoadBeneficiarySituation(id string, loadAllowance bool, c *fiber.Ctx) (BeneficiarySituation, error) {
+	ret := BeneficiarySituation{
+		WeekIsOk:  utils.IsWeekValid(time.Now()),
+		Allowance: make([]Allowance, 0),
+	}
+
+	monthlyOrdersAllowed := 0
+
 	query := `
+		SELECT b.profile, mop.num 
+			FROM beneficiaries b
+			INNER JOIN vu_monthly_orders_by_profile mop ON b.profile = mop.profile
+			WHERE b.id = ?
+			AND b.active = 1
+		`
+	row := params.Db.QueryRow(query, id)
+	if err := row.Scan(&ret.Profile, &monthlyOrdersAllowed); err != nil && err != sql.ErrNoRows {
+		return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "vu_monthly_orders_by_profile", &err)
+	} else if err != nil {
+		return ret, utils.SendError(c, fiber.StatusNotFound, "FHE009", "", nil)
+	}
+
+	// Was the last order done this week?
+	// ---
+	// In the following query, DATE(DATETIME('now', 'localtime'), 'weekday 1', '-7 days')
+	// is the date of last sunday, from yesterday. So if it's sunday, it's not today, but one
+	// week ago. Given that sunday it's not a working day it's acceptable. Must be changed
+	// if sunday IS a working day.
+	query = `
 		SELECT id, strftime('%Y%m%dT%H%M%S', datetime) AS datetime,
 		       UNIXEPOCH(datetime) >= UNIXEPOCH(DATE(DATETIME('now', 'localtime'), 'weekday 0', '-7 days') || ' 00:00:00') AS inThisWeek
 		  FROM orders 
 		 WHERE beneficiary_id = $1 
 		   AND active = 1
 		 ORDER BY datetime DESC
-		 LIMIT 1`
-	row := params.Db.QueryRow(query, id)
-	var lastOrder order
-	if err := row.Scan(&lastOrder.ID, &lastOrder.Date, &lastOrder.ThisWeek); err != nil && err != sql.ErrNoRows {
-		return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "orders", &err)
+		 LIMIT 1
+		`
+	row = params.Db.QueryRow(query, id)
+	var lastOrder Order
+	if err := row.Scan(&lastOrder.ID, &lastOrder.Date, &ret.TooManyOrdersInWeek); err != nil && err != sql.ErrNoRows {
+		return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "orders", &err)
 	} else if err == nil {
 		ret.LastOrder = &lastOrder
 	}
 
-	row = params.Db.QueryRow("SELECT profile FROM beneficiaries WHERE id = $1 AND active = 1", id)
-	if err := row.Scan(&ret.Profile); err != nil && err != sql.ErrNoRows {
-		return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "beneficiaries", &err)
-	} else if err != nil {
-		return utils.SendError(c, fiber.StatusNotFound, "FHE003", "", nil)
+	// How many orders were made this month, and are they too many for the profile?
+	query = `
+		SELECT COUNT(1) AS cnt
+		  FROM orders
+		 WHERE beneficiary_id = ?
+		   AND UNIXEPOCH(datetime) > UNIXEPOCH(DATETIME('now', 'start of month', 'weekday 1'))
+		`
+	row = params.Db.QueryRow(query, id)
+	if err := row.Scan(&ret.OrdersInMonth); err != nil {
+		return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "orders", &err)
 	}
+	ret.TooManyOrdersInMonth = ret.OrdersInMonth >= monthlyOrdersAllowed
 
-	if weekNo < 1 || weekNo > 4 {
-		ret.EnabledForWeek = false
-	} else {
-		query = fmt.Sprintf("SELECT enabled_w%d FROM vu_enabled_weeks WHERE profile = $1", weekNo)
-		var enabledForWeek int
-		row = params.Db.QueryRow(query, ret.Profile)
-		if err := row.Scan(&enabledForWeek); err != nil && err != sql.ErrNoRows {
-			return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "vu_enabled_weeks", &err)
-		} else if err != nil {
-			return utils.SendError(c, fiber.StatusNotFound, "FHE009", "", nil)
-		}
-		ret.EnabledForWeek = utils.Int2Bool(enabledForWeek)
-	}
-
-	if ret.EnabledForWeek {
+	// Given this is the (ret.OrdersInMonth + 1)th order this month, what is the allowance?
+	if loadAllowance {
 		query = fmt.Sprintf(`
-			SELECT r.item, r.quantity_w%d AS allowance
+			SELECT r.item, r.quantity_o%d AS allowance
 			  FROM rules r
 			  JOIN vu_items_lvl_1 il1 ON r.item = il1.item
-			 WHERE r.profile = $2
-			 ORDER BY il1.pos ASC`, weekNo)
-		rows, err := params.Db.Query(query, id, ret.Profile)
+			 WHERE r.profile = $1
+			 ORDER BY il1.pos ASC`, ret.OrdersInMonth+1)
+		rows, err := params.Db.Query(query, ret.Profile)
 		if err != nil {
-			return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "rules", &err)
+			return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "rules", &err)
 		}
 		defer rows.Close()
 		for rows.Next() {
-			var allowance allowance
+			var allowance Allowance
 			err = rows.Scan(&allowance.Item, &allowance.Allowance)
 			if err != nil {
-				return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "rules", &err)
+				return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "rules", &err)
 			}
 			ret.Allowance = append(ret.Allowance, allowance)
 		}
 		if err = rows.Err(); err != nil {
-			return utils.SendError(c, fiber.StatusInternalServerError, "FHE004", "rules", &err)
+			return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE004", "rules", &err)
 		}
 	}
 
-	c.JSON(ret)
-	return c.SendStatus(fiber.StatusOK)
+	return ret, nil
 }

@@ -39,6 +39,9 @@
             FHE101: "la nota è troppo lunga",
             FHE102: "ritiro non trovato",
             FHE103: "almeno un articolo supera la disponibilità da regole di profilo",
+            FHE104: "questa settimana è stato già compiuto un ritiro",
+            FHE105: "il numero di ritiri di questo mese ha superato il limite",
+            FHE106: "settimana non valida",
             FHE200: "impossibile trovare le intestazioni corrette nell'excel",
         },
         en: {
@@ -61,6 +64,9 @@
             FHE101: "note is too long",
             FHE102: "pickup not found",
             FHE103: "at least one item is not available due to profile rules",
+            FHE104: "an order has been already done this week",
+            FHE105: "this month, the number of orders exceeded the limit",
+            FHE106: "invalid week",
             FHE200: "cannot find correct headers in the excel data",
         },
     };
