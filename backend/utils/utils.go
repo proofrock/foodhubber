@@ -60,6 +60,11 @@ func WeekOfMonth(t time.Time) int {
 	return WeekOfMonth(t.AddDate(0, 0, -7)) + 1
 }
 
+func IsWeekValid(t time.Time) bool {
+	weekNo := WeekOfMonth(t)
+	return weekNo >= 1 && weekNo <= 4 // TODO not hard coded...
+}
+
 type errorr struct {
 	Code   string  `json:"code"`
 	Object string  `json:"object"`

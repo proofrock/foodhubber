@@ -65,6 +65,9 @@ func PutOrder(c *fiber.Ctx) error {
 	defer func() { go db_ops.Backup() }()
 	params.RWLock.Lock()
 	defer params.RWLock.Unlock()
+	if !utils.IsWeekValid(time.Now()) {
+		return utils.SendError(c, fiber.StatusBadRequest, "FHE106", "", nil)
+	}
 
 	tx, err := params.Db.BeginTx(context.Background(), nil)
 	if err != nil {

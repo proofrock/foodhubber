@@ -40,11 +40,7 @@ type allowance struct {
 	Allowance int    `json:"allowance"`
 }
 
-type response struct {
-	Profile        string      `json:"profile"`
-	LastOrder      *order      `json:"lastOrder"`
-	EnabledForWeek bool        `json:"enabledForWeek"`
-	Allowance      []allowance `json:"allowance"`
+	WeekIsOk             bool        `json:"weekIsOk"`
 }
 
 func GetBeneficiary(c *fiber.Ctx) error {

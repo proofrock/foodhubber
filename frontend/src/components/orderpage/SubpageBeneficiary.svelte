@@ -72,6 +72,7 @@
 </div>
 
 {#if details}
+    {#if details.weekIsOk}
     <Divider />
     <div class="center">
         <h5>Dati del beneficiario</h5>
@@ -127,6 +128,11 @@
         </div>
         <div class="col hide-on-small-and-down m2 l3 xl4" />
     </div>
+    {:else}
+        <center
+            ><h3>Non è possibile effettuare ritiri questa settimana</h3></center
+        >
+    {/if}
 {/if}
 
 <SpaceForFabs />
