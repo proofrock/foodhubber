@@ -59,28 +59,46 @@ func IsWeekValid(t time.Time) bool {
 	return weekNo >= 1 && weekNo <= 4 // TODO not hard coded...
 }
 
-type errorr struct {
-	Code   string  `json:"code"`
-	Object string  `json:"object"`
-	Error  *string `json:"error"`
+type ErrorWrapper struct {
+	Status       int
+	Code         string  `json:"code"`
+	Object       string  `json:"object"`
+	WrappedError *string `json:"error"`
 }
 
-func SendError(c *fiber.Ctx, status int, errCode string, obj string, err *error) error {
+func (e ErrorWrapper) Error() string {
+	str, _ := json.Marshal(e)
+	return string(str)
+}
+
+func MakeError(status int, errCode string, obj string, err *error) *ErrorWrapper {
 	var errString *string
 	if err != nil {
 		_errString := (*err).Error()
 		errString = &_errString
 	}
-	e := errorr{
-		Code:   errCode,
-		Object: obj,
-		Error:  errString,
+	ret := ErrorWrapper{
+		Status:       status,
+		Code:         errCode,
+		Object:       obj,
+		WrappedError: errString,
 	}
+	return &ret
+}
 
-	str, _ := json.Marshal(e)
+func SendMadeError(c *fiber.Ctx, wrappedErr ErrorWrapper) error {
+	str := wrappedErr.Error()
 	fmt.Fprintf(os.Stderr, "%s\n", str)
-	c.JSON(e)
-	return c.SendStatus(status)
+	c.JSON(wrappedErr) // FIXME marshalling is done two times
+	return c.SendStatus(wrappedErr.Status)
+}
+
+func SendError(c *fiber.Ctx, status int, errCode string, obj string, err *error) error {
+	wrappedErr := MakeError(status, errCode, obj, err)
+	str, _ := json.Marshal(*wrappedErr)
+	fmt.Fprintf(os.Stderr, "%s\n", str)
+	c.JSON(*wrappedErr) // FIXME marshalling is done two times
+	return c.SendStatus((*wrappedErr).Status)
 }
 
 func Int2Bool(val int) bool {

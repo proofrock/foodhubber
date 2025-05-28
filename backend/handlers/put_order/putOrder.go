@@ -73,17 +73,17 @@ func PutOrder(c *fiber.Ctx) error {
 		return utils.SendError(c, fiber.StatusBadRequest, "FHE106", "", nil)
 	}
 
-	details, err := get_beneficiary.LoadBeneficiarySituation(req.Beneficiary, false, c)
-	if err != nil {
-		return err
+	details, werr := get_beneficiary.LoadBeneficiarySituation(req.Beneficiary, false)
+	if werr != nil {
+		return utils.SendMadeError(c, *werr)
 	}
 
 	if details.TooManyOrdersInWeek {
-		return utils.SendError(c, fiber.StatusBadRequest, "FHE104", "", &err)
+		return utils.SendError(c, fiber.StatusBadRequest, "FHE104", "", nil)
 	}
 
 	if details.TooManyOrdersInMonth {
-		return utils.SendError(c, fiber.StatusBadRequest, "FHE105", "", &err)
+		return utils.SendError(c, fiber.StatusBadRequest, "FHE105", "", nil)
 	}
 
 	tx, err := params.Db.BeginTx(context.Background(), nil)

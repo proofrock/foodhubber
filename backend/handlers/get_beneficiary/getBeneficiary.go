@@ -55,9 +55,9 @@ func GetBeneficiary(c *fiber.Ctx) error {
 	params.RWLock.RLock()
 	defer params.RWLock.RUnlock()
 
-	ret, err := LoadBeneficiarySituation(id, true, c)
+	ret, err := LoadBeneficiarySituation(id, true)
 	if err != nil {
-		return err
+		return utils.SendMadeError(c, *err)
 	}
 
 	c.JSON(ret)
@@ -65,7 +65,7 @@ func GetBeneficiary(c *fiber.Ctx) error {
 }
 
 // Must lock before it!
-func LoadBeneficiarySituation(id string, loadAllowance bool, c *fiber.Ctx) (BeneficiarySituation, error) {
+func LoadBeneficiarySituation(id string, loadAllowance bool) (BeneficiarySituation, *utils.ErrorWrapper) {
 	ret := BeneficiarySituation{
 		WeekIsOk:  utils.IsWeekValid(time.Now()),
 		Allowance: make([]Allowance, 0),
@@ -82,9 +82,9 @@ func LoadBeneficiarySituation(id string, loadAllowance bool, c *fiber.Ctx) (Bene
 		`
 	row := params.Db.QueryRow(query, id)
 	if err := row.Scan(&ret.Profile, &monthlyOrdersAllowed); err != nil && err != sql.ErrNoRows {
-		return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "vu_monthly_orders_by_profile", &err)
+		return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "vu_monthly_orders_by_profile", &err)
 	} else if err != nil {
-		return ret, utils.SendError(c, fiber.StatusNotFound, "FHE009", "", nil)
+		return ret, utils.MakeError(fiber.StatusNotFound, "FHE009", "", nil)
 	}
 
 	// Was the last order done this week?
@@ -105,7 +105,7 @@ func LoadBeneficiarySituation(id string, loadAllowance bool, c *fiber.Ctx) (Bene
 	row = params.Db.QueryRow(query, id)
 	var lastOrder Order
 	if err := row.Scan(&lastOrder.ID, &lastOrder.Date, &ret.TooManyOrdersInWeek); err != nil && err != sql.ErrNoRows {
-		return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "orders", &err)
+		return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "orders", &err)
 	} else if err == nil {
 		ret.LastOrder = &lastOrder
 	}
@@ -119,7 +119,7 @@ func LoadBeneficiarySituation(id string, loadAllowance bool, c *fiber.Ctx) (Bene
 		`
 	row = params.Db.QueryRow(query, id)
 	if err := row.Scan(&ret.OrdersInMonth); err != nil {
-		return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "orders", &err)
+		return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "orders", &err)
 	}
 	ret.TooManyOrdersInMonth = ret.OrdersInMonth >= monthlyOrdersAllowed
 
@@ -133,19 +133,19 @@ func LoadBeneficiarySituation(id string, loadAllowance bool, c *fiber.Ctx) (Bene
 			 ORDER BY il1.pos ASC`, ret.OrdersInMonth+1)
 		rows, err := params.Db.Query(query, ret.Profile)
 		if err != nil {
-			return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "rules", &err)
+			return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "rules", &err)
 		}
 		defer rows.Close()
 		for rows.Next() {
 			var allowance Allowance
 			err = rows.Scan(&allowance.Item, &allowance.Allowance)
 			if err != nil {
-				return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "rules", &err)
+				return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "rules", &err)
 			}
 			ret.Allowance = append(ret.Allowance, allowance)
 		}
 		if err = rows.Err(); err != nil {
-			return ret, utils.SendError(c, fiber.StatusInternalServerError, "FHE004", "rules", &err)
+			return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE004", "rules", &err)
 		}
 	}
 
