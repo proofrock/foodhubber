@@ -1,0 +1,37 @@
+= Foodhubber v0.7 (preview)
+
+== Riepilogo feature
+
+* Secondo il profilo, ogni beneficiario ha 1, 2 o 4 accessi mensili indipendenti dalle settimane;
+** I profili A1 e A3 confluiranno quindi in un unico profilo A (1 accesso)
+* Un utente è ammesso se non ha superato il numero di accessi mensili, nel mese solare
+* Il primo accesso è consentito dal 1° lunedì
+* Gli accessi sono consentiti solo in settimane diverse
+* Le quantità disponibili al 2°/3°/4° accesso sono quelle che ora sono indicate per la 2^/3^/4^ settimana nei profili B e C.
+
+[NOTE]
+====
+Il flag `--force-week` è stato rimosso, non avendo senso per il nuovo assetto
+====
+
+== Creazione di un ambiente di test
+
+. Nel sistema in esercizio:
+.. Spegnere l'attuale server e riavviarlo, poi spegnerlo di nuovo. In questo modo si crea un backup del database nella cartella apposita.
+.. Portare in locale l'ultimo backup.
+. Rinominare il backup in `foodhubber.db`.
+. Aprire `foodhubber.db` con un editor di database che supporti **sqlite**, ad esempio DBeaver. footnote:[Se non si è familiari con un editor SQL adatto a sqlite, inviare il file (compresso) ad Aton per il passaggio 3.]
+. Eseguire gli statement SQL elencati nel file https://github.com/proofrock/foodhubber/blob/previews/v0.7/DB_MIGRATIONS.md[`DB_MIGRATIONS.md`], nella sezione `v0.6.3 -> v0.7.0`. footnote:[Questa operazione potrebbe creare due file aggiuntivi (`.db-shm` e `.db-wal`), vanno comunque considerati tutti e 3 per i punti successivi.]
+. Scaricare il file di distribuzione dell'applicazione, versione `0.7pre1` (o `pre2` ecc.) dalla sezione https://github.com/proofrock/foodhubber/releases[Releases], per il propio sistema operativo/architettura.
+. Scompattare il file di release e sostituire a `foodhubber.db` la propria versione, ottenuta dopo il punto 4.
+. Avviare l'eseguibile dell'applicazione e verificare che nella cartella `backup/` venga creato correttamente un primo backup.
+
+A questo punto, l'ambiente (eseguibile + 1 o 3 file di database) può essere distribuito ed eseguito direttamente sui PC di chi effettuerà i test.
+
+== Testing
+
+Essendo in questa versione cambiate sostanzialmente le regole di autorizzazione dei ritiri dei beneficiari, sarebbe importante creare ordini in date diverse.
+
+Probabilmente la cosa più semplice è avere un sistema in cui si può cambiare semplicemente la data, in maniera da provare i vari profili, due ordini nella stessa settimana, un ordine prima del primo lunedì del mese o dopo il quinto (non dovrebbe essere permesso), eccetera
+
+Per qualsiasi dubbio o chiarimento, rimaniamo a disposizione.

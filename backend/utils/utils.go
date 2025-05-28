@@ -24,8 +24,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/proofrock/foodhubber/params"
-
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -40,10 +38,6 @@ func FileExists(filePath string) bool {
 }
 
 func WeekOfMonth(t time.Time) int {
-	if params.ForcedWeek >= 0 {
-		return params.ForcedWeek
-	}
-
 	year, month, _ := t.Date()
 	firstOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, t.Location())
 	firstMonday := firstOfMonth
