@@ -11,7 +11,9 @@
 
 [NOTE]
 ====
-Il flag `--force-week` è stato rimosso, non avendo senso per il nuovo assetto
+Il flag `--force-week` è stato rimosso, non avendo senso per il nuovo assetto.
+
+E' stato parzialmente sostituito dal flag `--no-date-errors`. Questo evita due controlli: che la settimana del mese sia tra 1 e 4, e che non so possono fare due ordini nella stessa settimana.
 ====
 
 == Creazione di un ambiente di test

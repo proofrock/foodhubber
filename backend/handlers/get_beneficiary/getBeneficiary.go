@@ -87,13 +87,14 @@ func LoadBeneficiarySituation(id string, loadAllowance bool) (BeneficiarySituati
 		return ret, utils.MakeError(fiber.StatusNotFound, "FHE009", "", nil)
 	}
 
-	// Was the last order done this week?
-	// ---
-	// In the following query, DATE(DATETIME('now', 'localtime'), 'weekday 1', '-7 days')
-	// is the date of last sunday, from yesterday. So if it's sunday, it's not today, but one
-	// week ago. Given that sunday it's not a working day it's acceptable. Must be changed
-	// if sunday IS a working day.
-	query = `
+	if !params.NoDateErrors {
+		// Was the last order done this week?
+		// ---
+		// In the following query, DATE(DATETIME('now', 'localtime'), 'weekday 1', '-7 days')
+		// is the date of last sunday, from yesterday. So if it's sunday, it's not today, but one
+		// week ago. Given that sunday it's not a working day it's acceptable. Must be changed
+		// if sunday IS a working day.
+		query = `
 		SELECT id, strftime('%Y%m%dT%H%M%S', datetime) AS datetime,
 		       UNIXEPOCH(datetime) >= UNIXEPOCH(DATE(DATETIME('now', 'localtime'), 'weekday 0', '-7 days') || ' 00:00:00') AS inThisWeek
 		  FROM orders 
@@ -102,12 +103,13 @@ func LoadBeneficiarySituation(id string, loadAllowance bool) (BeneficiarySituati
 		 ORDER BY datetime DESC
 		 LIMIT 1
 		`
-	row = params.Db.QueryRow(query, id)
-	var lastOrder Order
-	if err := row.Scan(&lastOrder.ID, &lastOrder.Date, &ret.TooManyOrdersInWeek); err != nil && err != sql.ErrNoRows {
-		return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "orders", &err)
-	} else if err == nil {
-		ret.LastOrder = &lastOrder
+		row = params.Db.QueryRow(query, id)
+		var lastOrder Order
+		if err := row.Scan(&lastOrder.ID, &lastOrder.Date, &ret.TooManyOrdersInWeek); err != nil && err != sql.ErrNoRows {
+			return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "orders", &err)
+		} else if err == nil {
+			ret.LastOrder = &lastOrder
+		}
 	}
 
 	// How many orders were made this month, and are they too many for the profile?

@@ -20,3 +20,4 @@ package params
 
 var DbPath string
 var Port int
+var NoDateErrors bool

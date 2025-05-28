@@ -28,12 +28,12 @@ Stay tuned, e grazie per l'interessamento! 😉
   - es. sotto windows dovrebbe essere sufficiente fare doppio click sull'eseguibile.
 - collegarsi con un browser a <http://localhost:31020>
 
-E' attivo un beneficiario con Id `123`.
+E' attivo di default un beneficiario con Id `123` e profilo 'A' (un solo ordine per mese).
 
-Per test, potrebbe essere utile cambiare la settimana corrente; può essere fatto con il flag da linea di comando `--force-week`:
+Per test, potrebbe essere evitare i controlli sulla coerenza delle settimane (*); può essere fatto con il flag da linea di comando `--no-date-errors`. Questo evita due controlli: che la settimana del mese sia tra 1 e 4, e che non so possono fare due ordini nella stessa settimana.
 
 ```bash
-.\foodhubber.exe --force-week=1
+.\foodhubber.exe --no-date-errors
 ```
 
 ## Resources

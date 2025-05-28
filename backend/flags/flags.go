@@ -28,6 +28,7 @@ import (
 func Parse() {
 	_db := flag.String("db", "./foodhubber.db", "The path of the sqlite database; defaults to './foodhubber.db'")
 	_port := flag.Int("port", 31020, "Port; defaults to 31020")
+	_noDateErrors := flag.Bool("no-date-errors", false, "[FOR TESTS] If set, disable all errors relative to date (invalid week number, no orders in the same week)")
 
 	flag.Parse()
 
@@ -37,4 +38,5 @@ func Parse() {
 
 	params.DbPath = *_db
 	params.Port = *_port
+	params.NoDateErrors = *_noDateErrors
 }

@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/proofrock/foodhubber/params"
 )
 
 func Abort(msg string, a ...any) {
@@ -55,6 +56,9 @@ func WeekOfMonth(t time.Time) int {
 }
 
 func IsWeekValid(t time.Time) bool {
+	if !params.NoDateErrors {
+		return true
+	}
 	weekNo := WeekOfMonth(t)
 	return weekNo >= 1 && weekNo <= 4 // TODO not hard coded...
 }
