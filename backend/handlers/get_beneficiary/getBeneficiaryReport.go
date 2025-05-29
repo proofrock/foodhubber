@@ -81,7 +81,7 @@ func GetBeneficiaryReport(c *fiber.Ctx) error {
 	params.RWLock.RLock()
 	defer params.RWLock.RUnlock()
 
-	details, werr := LoadBeneficiarySituation(id, true)
+	details, werr := LoadBeneficiarySituation(id)
 	if werr != nil {
 		return utils.SendMadeError(c, *werr)
 	}

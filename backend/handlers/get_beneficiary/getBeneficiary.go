@@ -55,7 +55,7 @@ func GetBeneficiary(c *fiber.Ctx) error {
 	params.RWLock.RLock()
 	defer params.RWLock.RUnlock()
 
-	ret, err := LoadBeneficiarySituation(id, true)
+	ret, err := LoadBeneficiarySituation(id)
 	if err != nil {
 		return utils.SendMadeError(c, *err)
 	}
@@ -65,7 +65,7 @@ func GetBeneficiary(c *fiber.Ctx) error {
 }
 
 // Must lock before it!
-func LoadBeneficiarySituation(id string, loadAllowance bool) (BeneficiarySituation, *utils.ErrorWrapper) {
+func LoadBeneficiarySituation(id string) (BeneficiarySituation, *utils.ErrorWrapper) {
 	ret := BeneficiarySituation{
 		WeekIsOk:  utils.IsWeekValid(time.Now()),
 		Allowance: make([]Allowance, 0),
@@ -126,29 +126,27 @@ func LoadBeneficiarySituation(id string, loadAllowance bool) (BeneficiarySituati
 	ret.TooManyOrdersInMonth = ret.OrdersInMonth >= monthlyOrdersAllowed
 
 	// Given this is the (ret.OrdersInMonth + 1)th order this month, what is the allowance?
-	if loadAllowance {
-		query = fmt.Sprintf(`
+	query = fmt.Sprintf(`
 			SELECT r.item, r.quantity_o%d AS allowance
 			  FROM rules r
 			  JOIN vu_items_lvl_1 il1 ON r.item = il1.item
 			 WHERE r.profile = $1
 			 ORDER BY il1.pos ASC`, ret.OrdersInMonth+1)
-		rows, err := params.Db.Query(query, ret.Profile)
+	rows, err := params.Db.Query(query, ret.Profile)
+	if err != nil {
+		return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "rules", &err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var allowance Allowance
+		err = rows.Scan(&allowance.Item, &allowance.Allowance)
 		if err != nil {
 			return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "rules", &err)
 		}
-		defer rows.Close()
-		for rows.Next() {
-			var allowance Allowance
-			err = rows.Scan(&allowance.Item, &allowance.Allowance)
-			if err != nil {
-				return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "rules", &err)
-			}
-			ret.Allowance = append(ret.Allowance, allowance)
-		}
-		if err = rows.Err(); err != nil {
-			return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE004", "rules", &err)
-		}
+		ret.Allowance = append(ret.Allowance, allowance)
+	}
+	if err = rows.Err(); err != nil {
+		return ret, utils.MakeError(fiber.StatusInternalServerError, "FHE004", "rules", &err)
 	}
 
 	return ret, nil

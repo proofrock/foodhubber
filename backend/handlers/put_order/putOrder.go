@@ -20,7 +20,6 @@ package put_order
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/proofrock/foodhubber/db_ops"
@@ -73,7 +72,7 @@ func PutOrder(c *fiber.Ctx) error {
 		return utils.SendError(c, fiber.StatusBadRequest, "FHE106", "", nil)
 	}
 
-	details, werr := get_beneficiary.LoadBeneficiarySituation(req.Beneficiary, false)
+	details, werr := get_beneficiary.LoadBeneficiarySituation(req.Beneficiary)
 	if werr != nil {
 		return utils.SendMadeError(c, *werr)
 	}
@@ -86,10 +85,19 @@ func PutOrder(c *fiber.Ctx) error {
 		return utils.SendError(c, fiber.StatusBadRequest, "FHE105", "", nil)
 	}
 
+	if ok, werr := checkAllowance(details.Allowance, req.Rows); !ok {
+		return utils.SendError(c, fiber.StatusBadRequest, "FHE103", "", nil)
+	} else if werr != nil {
+		return utils.SendMadeError(c, *werr)
+	}
+
 	tx, err := params.Db.BeginTx(context.Background(), nil)
 	if err != nil {
 		return utils.SendError(c, fiber.StatusInternalServerError, "FHE007", "", &err)
 	}
+
+	// If there are not errors in the future, it reaches the final commit,
+	// then this rollback will be harmless. If it doesn't, rolls back.
 	defer tx.Rollback()
 
 	// All is good, save
@@ -124,32 +132,6 @@ func PutOrder(c *fiber.Ctx) error {
 		return utils.SendError(c, fiber.StatusInternalServerError, "FHE002", "stock", &err)
 	}
 
-	query = fmt.Sprintf(`
-			WITH ORDERED AS (
-			  SELECT il1.item, SUM(orw.quantity) as quantity
-			    FROM vu_items_lvl_1 il1
-			    JOIN items i ON il1.item = i.item 
-			    JOIN order_rows orw ON i.id = orw.item_id
-			    JOIN orders o ON orw.order_id = o.id 
-			   WHERE o.beneficiary_id = $1 
-			     AND o.active = 1
-			     AND o.datetime >= DATE(DATETIME('now', 'localtime'), 'weekday 1', '-7 days') || ' 00:00:00'
-			   GROUP BY il1.item)
-			, RESIDUAL AS (
-			  SELECT r.item, r.quantity_o%d - COALESCE(o.quantity, 0) AS residual
-			    FROM rules r
-			    JOIN beneficiaries b ON r.profile = b.profile
-			    LEFT JOIN ORDERED o ON r.item = o.item
-			   WHERE b.id = $1)
-			SELECT EXISTS (SELECT 1 FROM RESIDUAL WHERE residual < 0) AS err`, details.OrdersInMonth+1)
-	row = tx.QueryRow(query, req.Beneficiary)
-	var isErr int
-	if err := row.Scan(&isErr); err != nil {
-		return utils.SendError(c, fiber.StatusInternalServerError, "FHE001", "ops.RULES", &err)
-	} else if utils.Int2Bool(isErr) {
-		return utils.SendError(c, fiber.StatusBadRequest, "FHE103", "", nil)
-	}
-
 	params.TouchOrdersGen()
 	params.TouchStockGen()
 
@@ -170,4 +152,49 @@ func PutOrder(c *fiber.Ctx) error {
 
 	c.JSON(res)
 	return c.SendStatus(fiber.StatusOK)
+}
+
+// checks that the allowance (that is indicated by 'Item' column, aka the "group" of an item) doesn't go < 0
+// after subtracting all the order rows
+func checkAllowance(allowance []get_beneficiary.Allowance, orderRows []row) (bool, *utils.ErrorWrapper) {
+	// builds a map of item => allowance
+	allowanceMap := make(map[string]int)
+	for _, a := range allowance {
+		allowanceMap[a.Item] = a.Allowance
+	}
+
+	// retrieve a map of id => Item
+	itemIdMap := make(map[int]string)
+	sql := `
+		SELECT id, item
+		  FROM items
+		 WHERE active = 1`
+	rows, err := params.Db.Query(sql)
+	if err != nil {
+		return false, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "items", &err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id int
+		var item string
+		err = rows.Scan(&id, &item)
+		if err != nil {
+			return false, utils.MakeError(fiber.StatusInternalServerError, "FHE001", "items", &err)
+		}
+		itemIdMap[id] = item
+	}
+	if err = rows.Err(); err != nil {
+		return false, utils.MakeError(fiber.StatusInternalServerError, "FHE004", "items", &err)
+	}
+
+	// subtracts each item in the order from the allowance. If it's < 0, error
+	for _, row := range orderRows {
+		item := itemIdMap[row.Item]
+		allowanceMap[item] = allowanceMap[item] - row.Quantity
+		if allowanceMap[item] < 0 {
+			return false, nil
+		}
+	}
+
+	return true, nil
 }
