@@ -19,7 +19,7 @@ zbuild:
 
 run-devel:
 	cd frontend && npm install && npm run build
-	cd backend && go run main.go --db ../env/foodhubber.db
+	cd backend && go run main.go --no-date-errors --db ../env/foodhubber.db
 
 update:
 	cd frontend && npm install --save-dev husky

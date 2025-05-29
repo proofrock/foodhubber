@@ -2,8 +2,7 @@
 
 == Riepilogo feature
 
-* Secondo il profilo, ogni beneficiario ha 1, 2 o 4 accessi mensili indipendenti dalle settimane;
-** I profili A1 e A3 confluiranno quindi in un unico profilo A (1 accesso)
+* Secondo il profilo, ogni beneficiario ha 1 (`A1` e `A3`), 2 (`B`) o 4 (`C`) accessi mensili indipendenti dalle settimane;
 * Un utente è ammesso se non ha superato il numero di accessi mensili, nel mese solare
 * Il primo accesso è consentito dal 1° lunedì
 * Gli accessi sono consentiti solo in settimane diverse
@@ -13,7 +12,7 @@
 ====
 Il flag `--force-week` è stato rimosso, non avendo senso per il nuovo assetto.
 
-E' stato parzialmente sostituito dal flag `--no-date-errors`. Questo evita due controlli: che la settimana del mese sia tra 1 e 4, e che non so possono fare due ordini nella stessa settimana.
+E' stato parzialmente sostituito dal flag `--no-date-errors`. Questo evita due controlli: che la settimana del mese sia tra 1 e 4, e che non si possano fare due ordini nella stessa settimana.
 ====
 
 == Creazione di un ambiente di test

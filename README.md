@@ -30,7 +30,7 @@ Stay tuned, e grazie per l'interessamento! 😉
 
 E' attivo di default un beneficiario con Id `123` e profilo 'A' (un solo ordine per mese).
 
-Per test, potrebbe essere evitare i controlli sulla coerenza delle settimane (*); può essere fatto con il flag da linea di comando `--no-date-errors`. Questo evita due controlli: che la settimana del mese sia tra 1 e 4, e che non so possono fare due ordini nella stessa settimana.
+Per test, potrebbe essere evitare i controlli sulla coerenza delle settimane (*); può essere fatto con il flag da linea di comando `--no-date-errors`. Questo evita due controlli: che la settimana del mese sia tra 1 e 4, e che non si possano fare due ordini nella stessa settimana.
 
 ```bash
 .\foodhubber.exe --no-date-errors
