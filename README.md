@@ -21,7 +21,7 @@ Stay tuned, e grazie per l'interessamento! 😉
 
 ## Installazione (ita)
 
-- [Scaricare](https://github.com/proofrock/foodhubber/releases) il pacchetto per la propria architettura (es. `foodhubber-v0.7.pre2-win-amd64.zip`);
+- [Scaricare](https://github.com/proofrock/foodhubber/releases) il pacchetto per la propria architettura (es. `foodhubber-v0.7.pre3-win-amd64.zip`);
 - scompattarlo in una directory;
 - avviare l'eseguibile;
 - di default cerca il database nella directory di esecuzione;
